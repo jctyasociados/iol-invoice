@@ -26,13 +26,22 @@ import requests
 import math
 
 
-app = Flask(__name__,
-            static_url_path='', 
-            static_folder='static')
+app = Flask(__name__)
 
 
 #app.config.from_object(os.environ['APP_SETTINGS'])
+app.config['APP_SETTINGS'] = 'config.ProductionConfig'
+app.config['SECRET_KEY'] = 'd41d8cd98f00b204e9800998ecf8427e'
+app.config['SECURITY_PASSWORD_SALT'] = '7459178672f16e55e6d8099b02cf89e2'
+app.config['MAIL_USERNAME'] = 'iolenterprises@outlook.com'
+app.config['MAIL_PASSWORD'] = '1to1anyherzT&'
+app.config['MAIL_DEFAULT_SENDER'] = 'iolenterprises@outlook.com'
+app.config['RECAPTCHA_SITE_KEY'] = '6LeZOBUdAAAAAOBEkOrhBEJzQaw1DgtVpqZpDBhe'
+app.config['SECRET_SITE_KEY'] = '6LeZOBUdAAAAAMv6I_8SJ8AJLKweujjFYuD4kJGk'
+app.config['DROPBOX_ACCESS_TOKEN'] = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://fdjemxlb:3l8UnsKAzox30SfWcb2kGOG4w66YHyHe@queenie.db.elephantsql.com/fdjemxlb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 modus = Modus(app)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -119,7 +128,7 @@ def is_human(captcha_response):
     
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
-    sitekey = app.config['RECAPTCHA_SITE_KEY']
+    sitekey = app.config['RECAPTCHA_KEY']
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
