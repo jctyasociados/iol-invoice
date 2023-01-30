@@ -23,3 +23,4 @@ pypng
 psycopg2
 Babel
 requests
+python-dotenv
