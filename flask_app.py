@@ -117,7 +117,7 @@ def is_human(captcha_response):
     
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
-    sitekey = app.config['RECAPTCHA_KEY']
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
