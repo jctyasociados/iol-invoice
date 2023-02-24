@@ -1,4 +1,4 @@
-Flask==1.0.1
+Flask==1.0.2
 Flask-SQLAlchemy
 werkzeug==0.16.0
 flask-marshmallow
@@ -21,6 +21,10 @@ flask_debugtoolbar
 pyqrcode
 pypng
 psycopg2
+#psycopg2-binary
 Babel
 requests
-python-dotenv
+markupsafe==1.1.1
+itsdangerous==1.1.0
+bcrypt==1.0.2
+cryptography==3.3.1
