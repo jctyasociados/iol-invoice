@@ -20,8 +20,8 @@ class Config(object):
     MAIL_PASSWORD = os.environ['APP_MAIL_PASSWORD']
     # mail accounts
     MAIL_DEFAULT_SENDER = os.environ['APP_MAIL_USERNAME_SENDER']
-    RECAPTCHA_SITE_KEY = os.environ['SITE_KEY']
-    SECRET_SITE_KEY = os.environ['SECRET_KEY']
+    RECAPTCHA_SITE_KEY = os.environ['RECAPTCHA_KEY']
+    SECRET_SITE_KEY = os.environ['SECRET_KEY_RECAPTCHCA']
     
 
     #SQLALCHEMY_DATABASE_URI = 'mysql://uolcg8z6xjblwsuq:DlBzAEijVaY886OcOjjZ@b5ick1tqoytd9ldsooyn-mysql.services.clever-cloud.com:3306/b5ick1tqoytd9ldsooyn'
