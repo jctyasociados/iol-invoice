@@ -12,26 +12,22 @@ class Config(object):
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # mail settings
-    MAIL_SERVER = 'smtp.googlemail.com'
-    MAIL_PORT = 465
-    MAIL_USE_TLS = False
-    MAIL_USE_SSL = True
+  
+    
 
     # gmail authentication
-    MAIL_USERNAME = os.getenv('APP_MAIL_USERNAME')
-    MAIL_PASSWORD = os.getenv('APP_MAIL_PASSWORD')
-
+    MAIL_USERNAME = os.environ['APP_MAIL_USERNAME']
+    MAIL_PASSWORD = os.environ['APP_MAIL_PASSWORD']
     # mail accounts
-    MAIL_DEFAULT_SENDER = os.getenv('APP_MAIL_USERNAME_SENDER')
-    RECAPTCHA_SITE_KEY = os.getenv('RECAPTCHA_KEY')
-    SECRET_SITE_KEY = os.getenv('SECRET_KEY_RECAPTCHCA')
-    DROPBOX_ACCESS_TOKEN = os.getenv('DROPBOX_TOKEN')
+    MAIL_DEFAULT_SENDER = os.environ['APP_MAIL_USERNAME_SENDER']
+    RECAPTCHA_SITE_KEY = os.environ['SITE_KEY']
+    SECRET_SITE_KEY = os.environ['SECRET_KEY']
     
 
     #SQLALCHEMY_DATABASE_URI = 'mysql://uolcg8z6xjblwsuq:DlBzAEijVaY886OcOjjZ@b5ick1tqoytd9ldsooyn-mysql.services.clever-cloud.com:3306/b5ick1tqoytd9ldsooyn'
     #SQLALCHEMY_DATABASE_URI = 'postgresql://fdjemxlb:3l8UnsKAzox30SfWcb2kGOG4w66YHyHe@queenie.db.elephantsql.com/fdjemxlb'
        
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
 
 class ProductionConfig(Config):
