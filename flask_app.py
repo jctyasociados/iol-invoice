@@ -162,9 +162,9 @@ def contact():
 
             #text = message.as_string()
             with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-            context = ssl.create_default_context()
-            server.login(sender_email, password)
-            server.sendmail(sender_email, receiver_email, message)
+              context = ssl.create_default_context()
+              server.login(sender_email, password)
+              server.sendmail(sender_email, receiver_email, message)
         
             return render_template('contact-form-sent.html')
     
