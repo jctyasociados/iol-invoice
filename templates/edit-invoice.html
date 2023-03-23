@@ -181,9 +181,14 @@
       </div>
       </div>
       <div class="col-lg-6">
-      <div class="form-group">
-      <label for="datepicker">Select Invoice Date</label>
-      <input type="text" name="invoice_date" id="datepicker" class="form-control" placeholder="yyyy-mm-dd" value="{{ found_invoice_data.invoice_date }}"/>
+      <div class="form-group"> 
+      <label for="invoice_date">Date</label> 
+      <div class="input-group date">
+      
+      <input type="text" name="invoice_date" id="datepicker" class="form-control" placeholder="yyyy-mm-dd" value="{{ found_invoice_data.invoice_date }}" required/>
+        <div class="invalid-feedback">
+      Valid Date is required.
+    </div>
       </div>
       </div>
       </div>
