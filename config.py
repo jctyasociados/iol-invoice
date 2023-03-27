@@ -3,8 +3,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
     # main config
-    SECRET_KEY = 'd41d8cd98f00b204e9800998ecf8427e'
-    SECURITY_PASSWORD_SALT = '7459178672f16e55e6d8099b02cf89e2'
+    SECRET_KEY = os.environ['APP_SECRET_KEY']
+    SECURITY_PASSWORD_SALT = os.environ['APP_SECURITY_PASSWORD_SALT']
     DEBUG = False
     BCRYPT_LOG_ROUNDS = 13
     WTF_CSRF_ENABLED = True
