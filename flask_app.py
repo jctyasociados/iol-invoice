@@ -248,12 +248,13 @@ def upload():
             
             #print(width, height)
             finalimagename=name+"."+extension 
-            basewidth = 200
-            if width > 200:
+            baseheight = 106
+            if height > 106:
+                ratio = width / height
                 img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], destination))
-                wpercent = (basewidth / float(img.size[0]))
-                hsize = int((float(img.size[1]) * float(wpercent)))
-                img = img.resize((basewidth, hsize), Image.ANTIALIAS)
+                nheight = 106
+                basewidth = int(ratio * nheight)
+                img = img.resize((basewidth, nheight), Image.ANTIALIAS)
                 img.save(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
@@ -276,10 +277,12 @@ def upload():
             #transferData.upload_file(file_from, file_to)
             
             try:
-                dbx.files_delete_v2("/iolcloud/" + found_image_data.image_name)
-                transferData.upload_file(file_from, file_to)
+                if(dbx.files_delete_v2("/iolcloud/" + found_image_data.image_name)):
+                  transferData.upload_file(file_from, file_to)
+                  #print("Image Deleted")
             except:
                 transferData.upload_file(file_from, file_to)
+                #print("Image uploaded")
     
             #result = dbx.files_get_temporary_link(file_to)
             #dbx.sharing_create_shared_link(path = file_to, short_url=False, pending_upload=None)
@@ -287,15 +290,8 @@ def upload():
            
             name_url=result.replace("https:","")
             name_url_final=name_url.replace("?dl=0","?raw=1")
-            print(result)
-            print(name_url)  
-
-
-        
-
-            #print(url_link)
-            os.chdir(r"..")
             
+            os.chdir(r"..")
             
             user_hashed=current_user.user_id_hash
             
