@@ -104,9 +104,110 @@ def appindex():
 def about():
     return render_template('about.html')
     
-@app.route('/contact', methods=['GET', 'POST'])
 def contact():
-    return render_template('contact.html')
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        subject = request.form['subject']
+        message = request.form['message']
+        captcha_response = request.form['g-recaptcha-response']
+    
+        if not is_human(captcha_response):
+            # Log invalid attempts
+            status = "Sorry ! Please Check Im not a robot."
+            flash(status, "warning")
+            return render_template('contact.html', sitekey=sitekey)
+        else:    
+            #send contact mail
+            html = "<html><head></head><body>"
+            html += "<p>Name: " + name + "</p>"
+            html += "<p>Email: " + email + "</p>"
+            html += "<p>Subject: " + subject + "</p>"
+            message = "<br />".join(message.split("\n"))
+            html += "<p>Message: <br /><br />" + message + "</p>"
+            html += "</body></html>"
+        
+            body = html
+            email_username = app.config['MAIL_USERNAME']
+            sender_email = app.config['MAIL_DEFAULT_SENDER']
+            receiver_email = "jctyasociados@gmail.com"
+            password = app.config['MAIL_PASSWORD']
+
+            # Create a multipart message and set headers
+            message = MIMEMultipart()
+            message["From"] = "IOL Invoice " + '<' + sender_email + '>'
+            message["To"] = receiver_email
+            message["Subject"] = subject
+            #message["Bcc"] = receiver_email  # Recommended for mass emails
+
+            # Add body to email
+            message.attach(MIMEText(body, "html"))
+
+            #text = message.as_string()
+            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+            connection.starttls()
+            connection.login(email_username,password)
+            connection.send_message(message)
+            connection.quit()
+        
+            return render_template('contact-form-sent.html')
+    
+    return render_template('contact.html', sitekey=sitekey)
+    
+@app.route('/appcontact', methods=['GET', 'POST'])
+@login_required
+def appcontact():
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        subject = request.form['subject']
+        message = request.form['message']
+        captcha_response = request.form['g-recaptcha-response']
+    
+        if not is_human(captcha_response):
+            # Log invalid attempts
+            status = "Sorry ! Please Check Im not a robot."
+            flash(status, "warning")
+            return render_template('appcontact.html', sitekey=sitekey, user=current_user)
+        else:
+            #send contact mail
+            html = "<html><head></head><body>"
+            html += "<p>Name: " + name + "</p>"
+            html += "<p>Email: " + email + "</p>"
+            html += "<p>Subject: " + subject + "</p>"
+            message = "<br />".join(message.split("\n"))
+            html += "<p>Message: <br /><br />" + message + "</p>"
+            html += "</body></html>"
+        
+            body = html
+            email_username = app.config['MAIL_USERNAME']
+            sender_email = app.config['MAIL_DEFAULT_SENDER']
+            receiver_email = "jctyasociados@gmail.com"
+            password = app.config['MAIL_PASSWORD']
+
+            # Create a multipart message and set headers
+            message = MIMEMultipart()
+            message["From"] = "IOL Invoice " + '<' + sender_email + '>' 
+            message["To"] = receiver_email
+            message["Subject"] = subject
+            #message["Bcc"] = receiver_email  # Recommended for mass emails
+
+            # Add body to email
+            message.attach(MIMEText(body, "html"))
+
+            #text = message.as_string()
+            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+            connection.starttls()
+            connection.login(email_username,password)
+            connection.send_message(message)
+            connection.quit()
+        
+        
+            return render_template('app-contact-form-sent.html', user=current_user)
+    
+    return render_template('appcontact.html', sitekey=sitekey, user=current_user)
     
 @app.route('/upload', methods=['GET', 'POST'])
 @login_required
