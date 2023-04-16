@@ -336,7 +336,7 @@ def send_html():
     name=user_hashed
     name=name.replace("/","$$$")
     
-    access_token = app.config['DROPBOX_ACCESS_TOKEN']
+    access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
 
     dbx = dropbox.Dropbox(access_token)            
      
@@ -346,8 +346,6 @@ def send_html():
     file = open(app.config['UPLOAD_FOLDER'] + "/email" + name + ".html", "r")
     body = file.read()
     file.close()
-    port = 465  # For SSL
-    smtp_server = "smtp.gmail.com"
     email_username = app.config['MAIL_USERNAME']
     sender_email = app.config['MAIL_DEFAULT_SENDER']
     receiver_email = found_invoice_data.email
@@ -368,38 +366,39 @@ def send_html():
     name=user_hashed
     name=name.replace("/","$$$")
     
-    access_token = app.config['DROPBOX_ACCESS_TOKEN']
+    access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
 
     dbx = dropbox.Dropbox(access_token)            
      
     metadata = dbx.files_download_to_file(app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf", "/iolcloud/" + name + ".pdf")
     
-    filename_app = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
+    filename = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
     
     # Open PDF file in binary mode
     
-    #pdfname = 'writings.pdf'
-
-    # open the file in bynary
-    binary_pdf = open(filename_app, 'rb')
-
-    payload = MIMEBase('application', 'octate-stream', Name=filename_app)
-    # payload = MIMEBase('application', 'pdf', Name=pdfname)
-    payload.set_payload((binary_pdf).read())
-
-    # enconding the binary into base64
-    encoders.encode_base64(payload)
-
-    # add header with pdf name
-    payload.add_header('Content-Decomposition', 'attachment', filename=filename_app)
-    message.attach(payload)
-    #text = message.as_string()
-
-    #use gmail with port
+    with open(filename, "rb") as attachment:
+        # Add file as application/octet-stream
+        # Email client can usually download this automatically as attachment
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(attachment.read())
+    	# Encode file in ASCII characters to send by email
+    encoders.encode_base64(part)
+    # Add header as key/value pair to attachment part
+    part.add_header(
+	"Content-Disposition",
+	f"attachment; filename= {filename}"
+	)
+	
+	# Add attachment to message and convert message to string
+    message.attach(part)
+    text = message.as_string()
+	
+    # Log in to server using secure context and send email
+	
     context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, message)
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(email_username, password)
+        server.sendmail(sender_email, receiver_email, text)
     return render_template('email_sent.html', user=current_user)    
 
 
