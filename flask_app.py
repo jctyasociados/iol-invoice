@@ -94,7 +94,13 @@ class TransferData:
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/appabout')
+@login_required
+def appabout():
+    return render_template('appabout.html', user=current_user)
     
+   
 @app.route('/appindex')
 @login_required
 def appindex():
@@ -103,7 +109,8 @@ def appindex():
 @app.route('/about')
 def about():
     return render_template('about.html')
-    
+
+@app.route('/contact', methods=['GET', 'POST'])   
 def contact():
     sitekey = app.config['RECAPTCHA_SITE_KEY']
     if request.method == 'POST':
