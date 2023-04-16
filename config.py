@@ -23,10 +23,6 @@ class Config(object):
     RECAPTCHA_SITE_KEY = os.environ['RECAPTCHA_KEY']
     SECRET_SITE_KEY = os.environ['SECRET_KEY_RECAPTCHA']
     DROPBOX_ACCESS_TOKEN = os.environ['DROPBOX_TOKEN']
-    
-
-    #SQLALCHEMY_DATABASE_URI = 'mysql://uolcg8z6xjblwsuq:DlBzAEijVaY886OcOjjZ@b5ick1tqoytd9ldsooyn-mysql.services.clever-cloud.com:3306/b5ick1tqoytd9ldsooyn'
-    #SQLALCHEMY_DATABASE_URI = 'postgresql://fdjemxlb:3l8UnsKAzox30SfWcb2kGOG4w66YHyHe@queenie.db.elephantsql.com/fdjemxlb'
        
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
