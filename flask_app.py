@@ -299,7 +299,7 @@ def is_human(captcha_response):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    sitekey = "6Ldf1qccAAAAAEljwd2_mNlYGh1pthvlh6vkKmoo"
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
 
 
     # clear the inital flash message
@@ -352,7 +352,7 @@ def login():
 
 @app.route('/registration', methods=["GET", "POST"])
 def register():
-    sitekey = "6Ldf1qccAAAAAEljwd2_mNlYGh1pthvlh6vkKmoo"
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
     if request.method == 'GET':
         session.clear()
         return render_template('register.html')
@@ -451,7 +451,7 @@ def register():
     
 @app.route('/confirm/<token>')
 def confirm_email(token):
-    sitekey = "6Ldf1qccAAAAAEljwd2_mNlYGh1pthvlh6vkKmoo"
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
     try:
         email = confirm_token(token)
     except:
