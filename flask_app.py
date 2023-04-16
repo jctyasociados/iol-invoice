@@ -272,7 +272,7 @@ def upload():
                 image.save(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = image.size
                    
-            upload_path = app.config['UPLOAD_FOLDER']
+            upload_path = "../uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
