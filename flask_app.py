@@ -829,7 +829,7 @@ def invoice():
             os.chdir(upload_path)
             os.remove(destination)
             
-            access_token = app.config['DROPBOX_ACCESS_TOKEN']
+            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
             transferData = TransferData(access_token)
             
             file_from = finalimagename
@@ -977,7 +977,7 @@ def invoice():
             f.write("</table></td></tr></table>")
             f.close()            
             
-            access_token = app.config['DROPBOX_ACCESS_TOKEN']
+            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
             
             dbx = dropbox.Dropbox(access_token)
             found_html_template_data = db.session.query(TemplateHTMLData).filter_by(user_id=(user_hashed)).all()
@@ -1104,7 +1104,7 @@ def invoice():
             
             for item in query.items:
                 f.write("<tr><td style='width: 25%'><span><strong>Description</strong><br />" + item.item_desc +"</span></td><td style='width: 25%'><span><strong>Price</strong><br />" + format_currency(str(item.item_price), 'USD', locale='en_US') + "</span></td><td style='width: 25%'><span><strong>Quantity</strong><br />" + str(item.item_quant) + "</span></td><td style='width: 25%'><span><strong>Total</strong><br />" + format_currency(str(item.amount), 'USD', locale='en_US') + "</span></td></tr>")
-                sum += float(item.amount)
+                sum += item.amount
                 
                 list_sum.append(sum)
                 counter += 1
@@ -1127,7 +1127,7 @@ def invoice():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
+                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -1209,7 +1209,7 @@ def invoice():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
+                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
@@ -1299,7 +1299,7 @@ def invoice():
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
             
-            access_token = app.config['DROPBOX_ACCESS_TOKEN']
+            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
             
             dbx = dropbox.Dropbox(access_token)
             found_template_data = db.session.query(TemplateData).filter_by(user_id=(user_hashed)).all()
