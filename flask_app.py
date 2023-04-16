@@ -1,6 +1,7 @@
 from flask import Flask, request, redirect, url_for, render_template, jsonify, flash, session, json
 from flask_sqlalchemy import SQLAlchemy
 from flask_modus import Modus
+#from flask_mail import Mail
 from flask_moment import Moment
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
@@ -15,7 +16,7 @@ import dropbox
 from xhtml2pdf import pisa
 import datetime
 from flask_debugtoolbar import DebugToolbarExtension
-import email, ssl, smtplib
+import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
@@ -36,12 +37,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 modus = Modus(app)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+#bootstrap = Bootstrap()
 moment = Moment()
 bcrypt = Bcrypt(app)
+#mail = Mail(app)
 toolbar = DebugToolbarExtension(app)
 
 from token2 import generate_confirmation_token, confirm_token
-
+#from email2 import send_email
 
 @app.template_filter()
 def usdollar(value):
@@ -96,132 +99,18 @@ def index():
 @app.route('/appindex')
 @login_required
 def appindex():
-    return render_template('app-index.html', user=current_user)
-    
-@app.route('/appabout')
-@login_required
-def appabout():
-    return render_template('appabout.html', user=current_user)
+    return render_template('app-index.html', user=current_user)    
     
 @app.route('/about')
 def about():
     return render_template('about.html')
     
-def is_human(captcha_response):
-    """ Validating recaptcha response from google server
-        Returns True captcha test passed for submitted form else returns False.
-    """
-    secret = app.config['SECRET_SITE_KEY']
-    payload = {'response':captcha_response, 'secret':secret}
-    response = requests.post("https://www.google.com/recaptcha/api/siteverify", payload)
-    response_text = json.loads(response.text)
-    return response_text['success']
-    
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
-    sitekey = app.config['RECAPTCHA_SITE_KEY']
     if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        subject = request.form['subject']
-        message = request.form['message']
-        captcha_response = request.form['g-recaptcha-response']
+        return "Form Posted"
     
-        if not is_human(captcha_response):
-            # Log invalid attempts
-            status = "Sorry ! Please Check Im not a robot."
-            flash(status, "warning")
-            return render_template('contact.html', sitekey=sitekey)
-        else:    
-            #send contact mail
-            html = "<html><head></head><body>"
-            html += "<p>Name: " + name + "</p>"
-            html += "<p>Email: " + email + "</p>"
-            html += "<p>Subject: " + subject + "</p>"
-            message = "<br />".join(message.split("\n"))
-            html += "<p>Message: <br /><br />" + message + "</p>"
-            html += "</body></html>"
-        
-            body = html
-            email_username = app.config['MAIL_USERNAME']
-            sender_email = app.config['MAIL_DEFAULT_SENDER']
-            receiver_email = "jctyasociados@gmail.com"
-            password = app.config['MAIL_PASSWORD']
-
-            # Create a multipart message and set headers
-            message = MIMEMultipart()
-            message["From"] = "IOL Invoice " + '<' + sender_email + '>'
-            message["To"] = receiver_email
-            message["Subject"] = subject
-            #message["Bcc"] = receiver_email  # Recommended for mass emails
-
-            # Add body to email
-            message.attach(MIMEText(body, "html"))
-
-            #text = message.as_string()
-            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
-            connection.starttls()
-            connection.login(email_username,password)
-            connection.send_message(message)
-            connection.quit()
-        
-            return render_template('contact-form-sent.html')
-    
-    return render_template('contact.html', sitekey=sitekey)
-    
-@app.route('/appcontact', methods=['GET', 'POST'])
-@login_required
-def appcontact():
-    sitekey = app.config['RECAPTCHA_SITE_KEY']
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        subject = request.form['subject']
-        message = request.form['message']
-        captcha_response = request.form['g-recaptcha-response']
-    
-        if not is_human(captcha_response):
-            # Log invalid attempts
-            status = "Sorry ! Please Check Im not a robot."
-            flash(status, "warning")
-            return render_template('appcontact.html', sitekey=sitekey, user=current_user)
-        else:
-            #send contact mail
-            html = "<html><head></head><body>"
-            html += "<p>Name: " + name + "</p>"
-            html += "<p>Email: " + email + "</p>"
-            html += "<p>Subject: " + subject + "</p>"
-            message = "<br />".join(message.split("\n"))
-            html += "<p>Message: <br /><br />" + message + "</p>"
-            html += "</body></html>"
-        
-            body = html
-            email_username = app.config['MAIL_USERNAME']
-            sender_email = app.config['MAIL_DEFAULT_SENDER']
-            receiver_email = "jctyasociados@gmail.com"
-            password = app.config['MAIL_PASSWORD']
-
-            # Create a multipart message and set headers
-            message = MIMEMultipart()
-            message["From"] = "IOL Invoice " + '<' + sender_email + '>' 
-            message["To"] = receiver_email
-            message["Subject"] = subject
-            #message["Bcc"] = receiver_email  # Recommended for mass emails
-
-            # Add body to email
-            message.attach(MIMEText(body, "html"))
-
-            #text = message.as_string()
-            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
-            connection.starttls()
-            connection.login(email_username,password)
-            connection.send_message(message)
-            connection.quit()
-        
-        
-            return render_template('app-contact-form-sent.html', user=current_user)
-    
-    return render_template('appcontact.html', sitekey=sitekey, user=current_user)
+    return render_template('contact.html')
     
 @app.route('/upload', methods=['GET', 'POST'])
 @login_required
@@ -255,13 +144,12 @@ def upload():
             
             #print(width, height)
             finalimagename=name+"."+extension 
-            baseheight = 106
-            if height > 106:
-                ratio = width / height
+            basewidth = 200
+            if width > 200:
                 img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], destination))
-                nheight = 106
-                basewidth = int(ratio * nheight)
-                img = img.resize((basewidth, nheight), Image.ANTIALIAS)
+                wpercent = (basewidth / float(img.size[0]))
+                hsize = int((float(img.size[1]) * float(wpercent)))
+                img = img.resize((basewidth, hsize), Image.ANTIALIAS)
                 img.save(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
@@ -297,8 +185,15 @@ def upload():
            
             name_url=result.replace("https:","")
             name_url_final=name_url.replace("?dl=0","?raw=1")
-            
+            print(result)
+            print(name_url)  
+
+
+        
+
+            #print(url_link)
             os.chdir(r"..")
+            
             
             user_hashed=current_user.user_id_hash
             
@@ -389,17 +284,31 @@ def send_html():
     # add header with pdf name
     payload.add_header('Content-Decomposition', 'attachment', filename=filename_app)
     message.attach(payload)
-    #text = message.as_string()
+    text = message.as_string()
 
-    #use gmail with port
-    connection = smtplib.SMTP(host='smtp.office365.com', port=587)
-    connection.starttls()
-    connection.login(email_username,password)
-    connection.send_message(message)
-    connection.quit()
+    #use outlook with port
+    sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
+    sessionsmtp.ehlo()
+    #enable security
+    sessionsmtp.starttls()
+
+    #login with mail_id and password
+    sessionsmtp.login(email_username, password)
+
+    text = message.as_string()
+    sessionsmtp.sendmail(sender_email, receiver_email, text)
+    sessionsmtp.quit()
     return render_template('email_sent.html', user=current_user)    
 
-
+def is_human(captcha_response):
+    """ Validating recaptcha response from google server
+        Returns True captcha test passed for submitted form else returns False.
+    """
+    secret = app.config['SECRET_SITE_KEY']
+    payload = {'response':captcha_response, 'secret':secret}
+    response = requests.post("https://www.google.com/recaptcha/api/siteverify", payload)
+    response_text = json.loads(response.text)
+    return response_text['success']
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -451,73 +360,7 @@ def login():
         return redirect(request.args.get('next') or url_for('appindex'))
     
     	      	
-@app.route('/recover', methods=["GET", "POST"])
-def recover():
-    sitekey = app.config['RECAPTCHA_SITE_KEY']
-    if request.method == 'GET':
-        session.clear()
-        return render_template('password-recover.html', sitekey=sitekey)
-        
-    username = request.form['username']
-    captcha_response = request.form['g-recaptcha-response']
-    
-    if not is_human(captcha_response):
-            # Log invalid attempts
-            status = "Sorry ! Please Check Im not a robot."
-            flash(status, "warning")
-            return render_template('password-recover.html', sitekey=sitekey)
-    
-    found_user = db.session.query(User).filter_by(username=username).first()
-    if found_user:
-      token = generate_confirmation_token(found_user.email)
-      confirm_url = url_for('password_reset', token=token, username=username, _external=True)
-      html = render_template('recovery.html', confirm_url=confirm_url)
-      subject = "Please reset your password"
-      #send_email(user.email, subject, html)
-      # query the user
-      #registered_user = User.query.filter_by(username=user.username).first()
-      #login_user(user)
-      #login_user(registered_user)
-
-      
-      body = html
-      email_username = app.config['MAIL_USERNAME']
-      sender_email = app.config['MAIL_DEFAULT_SENDER']
-      password = app.config['MAIL_PASSWORD']
-
-      # Create a multipart message and set headers
-      message = MIMEMultipart()
-      message["From"] = "IOL Invoice" + '<' + sender_email + '>'
-      message["To"] = found_user.email
-      message["Subject"] = subject
-      #message["Bcc"] = receiver_email  # Recommended for mass emails
-
-      # Add body to email
-      message.attach(MIMEText(body, "html"))
-
-      #text = message.as_string()
-      #use outlook with port
-      sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
-      sessionsmtp.ehlo()
-      #enable security
-      sessionsmtp.starttls()
-
-      #login with mail_id and password
-      sessionsmtp.login(email_username, password)
-
-      text = message.as_string()
-      sessionsmtp.sendmail(sender_email, found_user.email, text)
-      sessionsmtp.quit()
-
-      flash("A Reset Password email has been sent via email.", "success")
-      return render_template('password-recover.html', sitekey=sitekey )
-        #flash("Account Created")
-        #return redirect(url_for('login'))
-      print(found_user.email)
-      return render_template('password-recover.html', sitekey=sitekey)
-    else:
-      flash("Username not found","warning")
-      return render_template('password-recover.html', sitekey=sitekey)
+          	
           	
 
 @app.route('/registration', methods=["GET", "POST"])
@@ -525,25 +368,18 @@ def register():
     sitekey = app.config['RECAPTCHA_SITE_KEY']
     if request.method == 'GET':
         session.clear()
-        return render_template('register.html', sitekey=sitekey)
+        return render_template('register.html')
 
     # get the data from our form
     password = request.form['password']
     conf_password = request.form['confirm-password']
     username = request.form['username']
     email = request.form['email']
-    captcha_response = request.form['g-recaptcha-response']
-    
-    
-    if not is_human(captcha_response):
-        # Log invalid attempts
-        status = "Sorry ! Please Check Im not a robot."
-        flash(status, "warning")
-        return render_template('register.html', sitekey=sitekey)
+
     # make sure the password match
     if conf_password != password:
-        flash("Passwords do not match", "warning")
-        return render_template('register.html', sitekey=sitekey)
+        flash("Passwords do not match")
+        return render_template('register.html')
 
     # check if it meets the right complexity
     check_password = password_check(password)
@@ -552,9 +388,10 @@ def register():
     if True in check_password.values():
         for k,v in check_password.items():
             if str(v) == "True":
-                flash(k, "warning")
+                flash(k)
 
-        return render_template('register.html', sitekey=sitekey)
+        return render_template('register.html')
+
     # hash the password for storage
     pw_hash = bcrypt.generate_password_hash(password).decode('utf-8')
     user_id_hashed = bcrypt.generate_password_hash(username).decode('utf-8')
@@ -641,7 +478,7 @@ def confirm_email(token):
         flash('The confirmation link is invalid or has expired.', 'warning')
         
     user = User.query.filter_by(email=email).first()
-    #print("error in confirm")
+    print("error in confirm")
     if user.confirmed:
         flash('Account already confirmed. Please login.', 'success')
         
@@ -652,56 +489,8 @@ def confirm_email(token):
         db.session.commit()
         flash('You have confirmed your account. Thanks!', 'success')
     return render_template('login.html', sitekey=sitekey)
-    
-@app.route('/password-recovery/<token>')
-def password_reset(token):
-    sitekey = app.config['RECAPTCHA_SITE_KEY']
-    try:
-        email = confirm_token(token)
-        username = request.args.get('username')
-        return render_template('password-recovery.html', sitekey=sitekey, username=username)
-    except:
-        flash('The reset password link is invalid or has expired.', 'warning')
-        
-    
          
-@app.route('/password-recover', methods=["GET", "POST"])
-def password_recover():
-    sitekey = app.config['RECAPTCHA_SITE_KEY']
-    if request.method == 'POST':
-        password = request.form['password']
-        confirm_password = request.form['confirm-password']
-        username = request.form['username']
-        captcha_response = request.form['g-recaptcha-response']
-    
-    
-        if not is_human(captcha_response):
-            # Log invalid attempts
-            status = "Sorry ! Please Check Im not a robot."
-            flash(status, "warning")
-            return render_template('password-recovery.html', sitekey=sitekey)
-        # make sure the password match
-        if confirm_password != password:
-            flash("Passwords do not match", "warning")
-            return render_template('password-recovery.html', sitekey=sitekey)
-        
-        # check if it meets the right complexity
-        check_password = password_check(password)
 
-         # generate error messages if it doesnt pass
-        if True in check_password.values():
-            for k,v in check_password.items():
-                if str(v) == "True":
-                    flash(k, "warning")
-
-            return render_template('password-recovery.html', sitekey=sitekey)
-       
-        pw_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-        user = db.session.query(User).filter_by(username=username).first()
-        user.password = pw_hash
-        db.session.commit()
-        
-        return render_template('password-recovered.html')
 
 
 @app.route('/logout')
