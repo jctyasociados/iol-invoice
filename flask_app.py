@@ -143,8 +143,6 @@ def contact():
             html += "</body></html>"
         
             body = html
-            port = 465
-            smtp_server = "smtp.gmail.com"
             email_username = app.config['MAIL_USERNAME']
             sender_email = app.config['MAIL_DEFAULT_SENDER']
             receiver_email = "jctyasociados@gmail.com"
@@ -161,10 +159,11 @@ def contact():
             message.attach(MIMEText(body, "html"))
 
             #text = message.as_string()
-            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-              context = ssl.create_default_context()
-              server.login(sender_email, password)
-              server.sendmail(sender_email, receiver_email, message)
+            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+            connection.starttls()
+            connection.login(email_username,password)
+            connection.send_message(message)
+            connection.quit()
         
             return render_template('contact-form-sent.html')
     
@@ -197,8 +196,6 @@ def appcontact():
             html += "</body></html>"
         
             body = html
-            port = 465  # For SSL
-            smtp_server = "smtp.gmail.com"
             email_username = app.config['MAIL_USERNAME']
             sender_email = app.config['MAIL_DEFAULT_SENDER']
             receiver_email = "jctyasociados@gmail.com"
@@ -215,11 +212,11 @@ def appcontact():
             message.attach(MIMEText(body, "html"))
 
             #text = message.as_string()
-            context = ssl.create_default_context()
-            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-                server.login(sender_email, password)
-                server.sendmail(sender_email, receiver_email, message)
-                server.quit()
+            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+            connection.starttls()
+            connection.login(email_username,password)
+            connection.send_message(message)
+            connection.quit()
         
         
             return render_template('app-contact-form-sent.html', user=current_user)
@@ -336,7 +333,7 @@ def send_html():
     name=user_hashed
     name=name.replace("/","$$$")
     
-    access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+    access_token = app.config['DROPBOX_ACCESS_TOKEN']
 
     dbx = dropbox.Dropbox(access_token)            
      
@@ -346,6 +343,7 @@ def send_html():
     file = open(app.config['UPLOAD_FOLDER'] + "/email" + name + ".html", "r")
     body = file.read()
     file.close()
+    
     email_username = app.config['MAIL_USERNAME']
     sender_email = app.config['MAIL_DEFAULT_SENDER']
     receiver_email = found_invoice_data.email
@@ -366,39 +364,39 @@ def send_html():
     name=user_hashed
     name=name.replace("/","$$$")
     
-    access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+    access_token = app.config['DROPBOX_ACCESS_TOKEN']
 
     dbx = dropbox.Dropbox(access_token)            
      
     metadata = dbx.files_download_to_file(app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf", "/iolcloud/" + name + ".pdf")
     
-    filename = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
+    filename_app = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
     
     # Open PDF file in binary mode
     
-    with open(filename, "rb") as attachment:
-        # Add file as application/octet-stream
-        # Email client can usually download this automatically as attachment
-        part = MIMEBase("application", "octet-stream")
-        part.set_payload(attachment.read())
-    	# Encode file in ASCII characters to send by email
-    encoders.encode_base64(part)
-    # Add header as key/value pair to attachment part
-    part.add_header(
-	"Content-Disposition",
-	f"attachment; filename= {filename}"
-	)
-	
-	# Add attachment to message and convert message to string
-    message.attach(part)
-    text = message.as_string()
-	
-    # Log in to server using secure context and send email
-	
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-        server.login(email_username, password)
-        server.sendmail(sender_email, receiver_email, text)
+    #pdfname = 'writings.pdf'
+
+    # open the file in bynary
+    binary_pdf = open(filename_app, 'rb')
+
+    payload = MIMEBase('application', 'octate-stream', Name=filename_app)
+    # payload = MIMEBase('application', 'pdf', Name=pdfname)
+    payload.set_payload((binary_pdf).read())
+
+    # enconding the binary into base64
+    encoders.encode_base64(payload)
+
+    # add header with pdf name
+    payload.add_header('Content-Decomposition', 'attachment', filename=filename_app)
+    message.attach(payload)
+    #text = message.as_string()
+
+    #use gmail with port
+    connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+    connection.starttls()
+    connection.login(email_username,password)
+    connection.send_message(message)
+    connection.quit()
     return render_template('email_sent.html', user=current_user)    
 
 
@@ -483,8 +481,6 @@ def recover():
 
       
       body = html
-      port = 465  # For SSL
-      smtp_server = "smtp.gmail.com"
       email_username = app.config['MAIL_USERNAME']
       sender_email = app.config['MAIL_DEFAULT_SENDER']
       password = app.config['MAIL_PASSWORD']
@@ -501,10 +497,17 @@ def recover():
 
       #text = message.as_string()
       #use outlook with port
-      context = ssl.create_default_context()
-      with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, found_user.email, message)
+      sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
+      sessionsmtp.ehlo()
+      #enable security
+      sessionsmtp.starttls()
+
+      #login with mail_id and password
+      sessionsmtp.login(email_username, password)
+
+      text = message.as_string()
+      sessionsmtp.sendmail(sender_email, found_user.email, text)
+      sessionsmtp.quit()
 
       flash("A Reset Password email has been sent via email.", "success")
       return render_template('password-recover.html', sitekey=sitekey )
@@ -581,8 +584,6 @@ def register():
 
         subject = "Confirm Your Registration"
         body = html
-        port = 465  # For SSL
-        smtp_server = "smtp.gmail.com"
         email_username = app.config['MAIL_USERNAME']
         sender_email = app.config['MAIL_DEFAULT_SENDER']
         password = app.config['MAIL_PASSWORD']
@@ -599,12 +600,18 @@ def register():
 
         text = message.as_string()
 
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-            server.login(sender_email, password)
-            text = message.as_string()
-            server.sendmail(sender_email, user.email, text)
-            server.quit()
+        #use outlook with port
+        sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
+        sessionsmtp.ehlo()
+        #enable security
+        sessionsmtp.starttls()
+
+        #login with mail_id and password
+        sessionsmtp.login(email_username, password)
+
+        text = message.as_string()
+        sessionsmtp.sendmail(sender_email, user.email, text)
+        sessionsmtp.quit()
 
         flash("A confirmation email has been sent via email.", "success")
         return render_template('login.html', sitekey=sitekey )
@@ -829,7 +836,7 @@ def invoice():
             os.chdir(upload_path)
             os.remove(destination)
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             transferData = TransferData(access_token)
             
             file_from = finalimagename
@@ -977,7 +984,7 @@ def invoice():
             f.write("</table></td></tr></table>")
             f.close()            
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             
             dbx = dropbox.Dropbox(access_token)
             found_html_template_data = db.session.query(TemplateHTMLData).filter_by(user_id=(user_hashed)).all()
@@ -1104,7 +1111,7 @@ def invoice():
             
             for item in query.items:
                 f.write("<tr><td style='width: 25%'><span><strong>Description</strong><br />" + item.item_desc +"</span></td><td style='width: 25%'><span><strong>Price</strong><br />" + format_currency(str(item.item_price), 'USD', locale='en_US') + "</span></td><td style='width: 25%'><span><strong>Quantity</strong><br />" + str(item.item_quant) + "</span></td><td style='width: 25%'><span><strong>Total</strong><br />" + format_currency(str(item.amount), 'USD', locale='en_US') + "</span></td></tr>")
-                sum += item.amount
+                sum += float(item.amount)
                 
                 list_sum.append(sum)
                 counter += 1
@@ -1127,7 +1134,7 @@ def invoice():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -1209,7 +1216,7 @@ def invoice():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
@@ -1299,7 +1306,7 @@ def invoice():
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             
             dbx = dropbox.Dropbox(access_token)
             found_template_data = db.session.query(TemplateData).filter_by(user_id=(user_hashed)).all()
