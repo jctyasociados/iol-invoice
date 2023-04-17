@@ -11,6 +11,7 @@ class Config(object):
     DEBUG_TB_ENABLED = False
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    UPLOAD_FOLDER = "static/uploads"
     # mail settings
   
     

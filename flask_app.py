@@ -406,11 +406,10 @@ def send_html():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    sitekey = app.config['RECAPTCHA_SITE_KEY']
-
-
     # clear the inital flash message
     session.clear()
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
+    
     if request.method == 'GET':
         return render_template('login.html', sitekey=sitekey)
     if request.method == 'POST':
