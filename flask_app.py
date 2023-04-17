@@ -33,8 +33,7 @@ app = Flask(__name__,
 
 #app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = app.config['SECRET_KEY']
-modus = Modus(app)
+
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 moment = Moment()
