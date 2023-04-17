@@ -4485,6 +4485,7 @@ def password_check(password):
     
         
 if __name__ == "__main__":
+    app.secret_key = app.config['SECRET_KEY']
     app.run()
 
                
