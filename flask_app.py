@@ -407,8 +407,7 @@ def send_html():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    # clear the inital flash message
-    session.clear()
+    
     sitekey = app.config['RECAPTCHA_SITE_KEY']
     
     if request.method == 'GET':
