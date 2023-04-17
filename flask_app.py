@@ -399,13 +399,13 @@ def send_html():
     connection.quit()"""
 
     with open(filename_app, "rb") as attachment:
-    # Add the attachment to the message
-    part = MIMEBase("application", "octet-stream")
-    part.set_payload((attachment).read())
-    encoders.encode_base64(part)
-    part.add_header(
-    "Content-Disposition",
-    f"attachment; filename={os.path.basename(filename_app)}",)
+        # Add the attachment to the message
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload((attachment).read())
+        encoders.encode_base64(part)
+        part.add_header(
+        "Content-Disposition",
+        f"attachment; filename={os.path.basename(filename_app)}",)
 
     message = MIMEMultipart()
     message['Subject'] = subject
