@@ -11,38 +11,28 @@
 
   <div class="starter-template">
     <h1>IOL Invoice</h1>
-    
+    <div>
     {% for date_found in found_date.items %}
-    <div class="row g-3">
-      <div class="col-12 portfolio-item">
-    
-    <span>Found Invoice: Client {{ date_found.businessname }} Invoice Number {{ date_found.invoice_number }}</span>
-    
-    </div>
-    
-      
-      <div class="col-sm-6 portfolio-item">
-    <form method="POST" action="/invoicenumberresults" enctype="multipart/form-data" id="invoice-number-results">
+    <div class="row">
+      <div class="col-lg-6">
+    <form method="POST" action="/invoicenumberresults">
     <div class="form-group">
+    <span>Found Invoice: Client {{ date_found.businessname }} Invoice Number {{ date_found.invoice_number }}</span>
     <input type="hidden" class="form-control" id="invoicenumber" name="invoice_number" value="{{ date_found.invoice_number }}" />
-    <input type="submit" class="btn btn-primary btn-sm btn-info" value="View">
+    <button class="btn btn-primary btn-sm btn-info" type="submit" style="margin-top: 20px;">View</button>
     </form>
     </div>
-    </div>
-    <div class="col-sm-6 portfolio-item">
+    
+      </div>
+      <div class="col-lg-6">
     <form method="POST" action="/editinvoice">
     <div class="form-group">
     <input type="hidden" class="form-control" id="invoicenumber" name="invoice_number" value="{{ date_found.invoice_number }}" />
-    <input type="submit" class="btn btn-primary btn-sm btn-info" value="Edit">
+    <button class="btn btn-primary btn-sm btn-info" type="submit" style="margin-top: 20px; float: left;">Edit</button>
     </form>
     </div>
     </div>
     </div>
-    
-    <div class="progress" id="loader">
-  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">Processing Form</div>
-</div>
-<br />
     {% endfor %}
     
     <!-- Pagination Links-->
@@ -89,17 +79,5 @@
 </div>
 
 <script src="js/jquery-3.2.1.min.js"></script>
-<script type="text/javascript">
-      
-    $(document).ready(function () {
-      
-    $("form#invoice-number-results").submit(function(event){
-    //event.preventDefault();
-    $("#loader").show();
-  //alert("form submiting");
-    return true;
-    });
-      
-    });
-</script>
+ 
 {% endblock %}

@@ -1,7 +1,6 @@
 from flask import Flask, request, redirect, url_for, render_template, jsonify, flash, session, json
 from flask_sqlalchemy import SQLAlchemy
 from flask_modus import Modus
-#from flask_mail import Mail
 from flask_moment import Moment
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
@@ -16,15 +15,16 @@ import dropbox
 from xhtml2pdf import pisa
 import datetime
 from flask_debugtoolbar import DebugToolbarExtension
-import email, smtplib, ssl
-
-from email import encoders
-from email.mime.base import MIMEBase
+import email, ssl, smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 from pyqrcode import QRCode
 from babel.numbers import format_currency 
 import requests
+import math
+
 
 app = Flask(__name__,
             static_url_path='', 
@@ -36,14 +36,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 modus = Modus(app)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
-#bootstrap = Bootstrap()
 moment = Moment()
 bcrypt = Bcrypt(app)
-#mail = Mail(app)
 toolbar = DebugToolbarExtension(app)
 
 from token2 import generate_confirmation_token, confirm_token
-#from email2 import send_email
+
 
 @app.template_filter()
 def usdollar(value):
@@ -98,11 +96,26 @@ def index():
 @app.route('/appindex')
 @login_required
 def appindex():
-    return render_template('app-index.html', user=current_user)    
+    return render_template('app-index.html', user=current_user)
+    
+@app.route('/appabout')
+@login_required
+def appabout():
+    return render_template('appabout.html', user=current_user)
     
 @app.route('/about')
 def about():
     return render_template('about.html')
+    
+def is_human(captcha_response):
+    """ Validating recaptcha response from google server
+        Returns True captcha test passed for submitted form else returns False.
+    """
+    secret = app.config['SECRET_SITE_KEY']
+    payload = {'response':captcha_response, 'secret':secret}
+    response = requests.post("https://www.google.com/recaptcha/api/siteverify", payload)
+    response_text = json.loads(response.text)
+    return response_text['success']
     
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -242,12 +255,13 @@ def upload():
             
             #print(width, height)
             finalimagename=name+"."+extension 
-            basewidth = 200
-            if width > 200:
+            baseheight = 106
+            if height > 106:
+                ratio = width / height
                 img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], destination))
-                wpercent = (basewidth / float(img.size[0]))
-                hsize = int((float(img.size[1]) * float(wpercent)))
-                img = img.resize((basewidth, hsize), Image.ANTIALIAS)
+                nheight = 106
+                basewidth = int(ratio * nheight)
+                img = img.resize((basewidth, nheight), Image.ANTIALIAS)
                 img.save(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
@@ -270,10 +284,12 @@ def upload():
             #transferData.upload_file(file_from, file_to)
             
             try:
-                dbx.files_delete_v2("/iolcloud/" + found_image_data.image_name)
-                transferData.upload_file(file_from, file_to)
+                if(dbx.files_delete_v2("/iolcloud/" + found_image_data.image_name)):
+                  transferData.upload_file(file_from, file_to)
+                  #print("Image Deleted")
             except:
                 transferData.upload_file(file_from, file_to)
+                #print("Image uploaded")
     
             #result = dbx.files_get_temporary_link(file_to)
             #dbx.sharing_create_shared_link(path = file_to, short_url=False, pending_upload=None)
@@ -281,15 +297,8 @@ def upload():
            
             name_url=result.replace("https:","")
             name_url_final=name_url.replace("?dl=0","?raw=1")
-            print(result)
-            print(name_url)  
-
-
-        
-
-            #print(url_link)
-            os.chdir(r"..")
             
+            os.chdir(r"..")
             
             user_hashed=current_user.user_id_hash
             
@@ -334,6 +343,7 @@ def send_html():
     file = open(app.config['UPLOAD_FOLDER'] + "/email" + name + ".html", "r")
     body = file.read()
     file.close()
+    
     email_username = app.config['MAIL_USERNAME']
     sender_email = app.config['MAIL_DEFAULT_SENDER']
     receiver_email = found_invoice_data.email
@@ -360,44 +370,36 @@ def send_html():
      
     metadata = dbx.files_download_to_file(app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf", "/iolcloud/" + name + ".pdf")
     
-    filename = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
+    filename_app = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
     
     # Open PDF file in binary mode
     
-    with open(filename, "rb") as attachment:
-        # Add file as application/octet-stream
-        # Email client can usually download this automatically as attachment
-        part = MIMEBase("application", "octet-stream")
-        part.set_payload(attachment.read())
-    	# Encode file in ASCII characters to send by email
-    encoders.encode_base64(part)
-    # Add header as key/value pair to attachment part
-    part.add_header(
-	"Content-Disposition",
-	f"attachment; filename= {filename}"
-	)
-	
-	# Add attachment to message and convert message to string
-    message.attach(part)
-    text = message.as_string()
-	
-    # Log in to server using secure context and send email
-	
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-        server.login(email_username, password)
-        server.sendmail(sender_email, receiver_email, text)
+    #pdfname = 'writings.pdf'
+
+    # open the file in bynary
+    binary_pdf = open(filename_app, 'rb')
+
+    payload = MIMEBase('application', 'octate-stream', Name=filename_app)
+    # payload = MIMEBase('application', 'pdf', Name=pdfname)
+    payload.set_payload((binary_pdf).read())
+
+    # enconding the binary into base64
+    encoders.encode_base64(payload)
+
+    # add header with pdf name
+    payload.add_header('Content-Decomposition', 'attachment', filename=filename_app)
+    message.attach(payload)
+    #text = message.as_string()
+
+    #use gmail with port
+    connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+    connection.starttls()
+    connection.login(email_username,password)
+    connection.send_message(message)
+    connection.quit()
     return render_template('email_sent.html', user=current_user)    
 
-def is_human(captcha_response):
-    """ Validating recaptcha response from google server
-        Returns True captcha test passed for submitted form else returns False.
-    """
-    secret = app.config['APP_SECRET_KEY']
-    payload = {'response':captcha_response, 'secret':secret}
-    response = requests.post("https://www.google.com/recaptcha/api/siteverify", payload)
-    response_text = json.loads(response.text)
-    return response_text['success']
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -425,31 +427,97 @@ def login():
 
         # check the passwords
         if registered_user is None:
-            flash('Invalid Username', "danger")
+            flash("Invalid Username", "warning")
             return render_template('login.html', sitekey=sitekey)
         
         if registered_user.username == username and bcrypt.check_password_hash(registered_user.password, password) == False:
-    	    flash('Invalid Password', "danger")
+    	    flash("Invalid Password", "warning")
     	    return render_template('login.html', sitekey=sitekey)
         
         if not is_human(captcha_response):
             # Log invalid attempts
             status = "Sorry ! Please Check Im not a robot."
-            flash(status, "danger")
+            flash(status, "warning")
             return render_template('login.html', sitekey=sitekey)
         #return redirect(url_for('login'))
 
         # login the user
         
         if registered_user.username == username and bcrypt.check_password_hash(registered_user.password, password) == True and registered_user.confirmed == False:
-            flash('You have to confirm your email.', "danger")
+            flash("You have to confirm your email.", "warning")
             return render_template('login.html', sitekey=sitekey)
         elif registered_user.username == username and bcrypt.check_password_hash(registered_user.password, password) == True and registered_user.confirmed == True:
     	    login_user(registered_user, remember=remember_me)  
         return redirect(request.args.get('next') or url_for('appindex'))
     
     	      	
-          	
+@app.route('/recover', methods=["GET", "POST"])
+def recover():
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
+    if request.method == 'GET':
+        session.clear()
+        return render_template('password-recover.html', sitekey=sitekey)
+        
+    username = request.form['username']
+    captcha_response = request.form['g-recaptcha-response']
+    
+    if not is_human(captcha_response):
+            # Log invalid attempts
+            status = "Sorry ! Please Check Im not a robot."
+            flash(status, "warning")
+            return render_template('password-recover.html', sitekey=sitekey)
+    
+    found_user = db.session.query(User).filter_by(username=username).first()
+    if found_user:
+      token = generate_confirmation_token(found_user.email)
+      confirm_url = url_for('password_reset', token=token, username=username, _external=True)
+      html = render_template('recovery.html', confirm_url=confirm_url)
+      subject = "Please reset your password"
+      #send_email(user.email, subject, html)
+      # query the user
+      #registered_user = User.query.filter_by(username=user.username).first()
+      #login_user(user)
+      #login_user(registered_user)
+
+      
+      body = html
+      email_username = app.config['MAIL_USERNAME']
+      sender_email = app.config['MAIL_DEFAULT_SENDER']
+      password = app.config['MAIL_PASSWORD']
+
+      # Create a multipart message and set headers
+      message = MIMEMultipart()
+      message["From"] = "IOL Invoice" + '<' + sender_email + '>'
+      message["To"] = found_user.email
+      message["Subject"] = subject
+      #message["Bcc"] = receiver_email  # Recommended for mass emails
+
+      # Add body to email
+      message.attach(MIMEText(body, "html"))
+
+      #text = message.as_string()
+      #use outlook with port
+      sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
+      sessionsmtp.ehlo()
+      #enable security
+      sessionsmtp.starttls()
+
+      #login with mail_id and password
+      sessionsmtp.login(email_username, password)
+
+      text = message.as_string()
+      sessionsmtp.sendmail(sender_email, found_user.email, text)
+      sessionsmtp.quit()
+
+      flash("A Reset Password email has been sent via email.", "success")
+      return render_template('password-recover.html', sitekey=sitekey )
+        #flash("Account Created")
+        #return redirect(url_for('login'))
+      print(found_user.email)
+      return render_template('password-recover.html', sitekey=sitekey)
+    else:
+      flash("Username not found","warning")
+      return render_template('password-recover.html', sitekey=sitekey)
           	
 
 @app.route('/registration', methods=["GET", "POST"])
@@ -457,18 +525,25 @@ def register():
     sitekey = app.config['RECAPTCHA_SITE_KEY']
     if request.method == 'GET':
         session.clear()
-        return render_template('register.html')
+        return render_template('register.html', sitekey=sitekey)
 
     # get the data from our form
     password = request.form['password']
     conf_password = request.form['confirm-password']
     username = request.form['username']
     email = request.form['email']
-
+    captcha_response = request.form['g-recaptcha-response']
+    
+    
+    if not is_human(captcha_response):
+        # Log invalid attempts
+        status = "Sorry ! Please Check Im not a robot."
+        flash(status, "warning")
+        return render_template('register.html', sitekey=sitekey)
     # make sure the password match
     if conf_password != password:
-        flash("Passwords do not match")
-        return render_template('register.html')
+        flash("Passwords do not match", "warning")
+        return render_template('register.html', sitekey=sitekey)
 
     # check if it meets the right complexity
     check_password = password_check(password)
@@ -477,10 +552,9 @@ def register():
     if True in check_password.values():
         for k,v in check_password.items():
             if str(v) == "True":
-                flash(k)
+                flash(k, "warning")
 
-        return render_template('register.html')
-
+        return render_template('register.html', sitekey=sitekey)
     # hash the password for storage
     pw_hash = bcrypt.generate_password_hash(password).decode('utf-8')
     user_id_hashed = bcrypt.generate_password_hash(username).decode('utf-8')
@@ -526,11 +600,18 @@ def register():
 
         text = message.as_string()
 
-        # Log in to server using secure context and send email      
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(email_username, password)
-            server.sendmail(sender_email, user.email, text)
+        #use outlook with port
+        sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
+        sessionsmtp.ehlo()
+        #enable security
+        sessionsmtp.starttls()
+
+        #login with mail_id and password
+        sessionsmtp.login(email_username, password)
+
+        text = message.as_string()
+        sessionsmtp.sendmail(sender_email, user.email, text)
+        sessionsmtp.quit()
 
         flash("A confirmation email has been sent via email.", "success")
         return render_template('login.html', sitekey=sitekey )
@@ -557,10 +638,10 @@ def confirm_email(token):
     try:
         email = confirm_token(token)
     except:
-        flash('The confirmation link is invalid or has expired.', 'danger')
+        flash('The confirmation link is invalid or has expired.', 'warning')
         
     user = User.query.filter_by(email=email).first()
-    print("error in confirm")
+    #print("error in confirm")
     if user.confirmed:
         flash('Account already confirmed. Please login.', 'success')
         
@@ -571,8 +652,56 @@ def confirm_email(token):
         db.session.commit()
         flash('You have confirmed your account. Thanks!', 'success')
     return render_template('login.html', sitekey=sitekey)
+    
+@app.route('/password-recovery/<token>')
+def password_reset(token):
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
+    try:
+        email = confirm_token(token)
+        username = request.args.get('username')
+        return render_template('password-recovery.html', sitekey=sitekey, username=username)
+    except:
+        flash('The reset password link is invalid or has expired.', 'warning')
+        
+    
          
+@app.route('/password-recover', methods=["GET", "POST"])
+def password_recover():
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
+    if request.method == 'POST':
+        password = request.form['password']
+        confirm_password = request.form['confirm-password']
+        username = request.form['username']
+        captcha_response = request.form['g-recaptcha-response']
+    
+    
+        if not is_human(captcha_response):
+            # Log invalid attempts
+            status = "Sorry ! Please Check Im not a robot."
+            flash(status, "warning")
+            return render_template('password-recovery.html', sitekey=sitekey)
+        # make sure the password match
+        if confirm_password != password:
+            flash("Passwords do not match", "warning")
+            return render_template('password-recovery.html', sitekey=sitekey)
+        
+        # check if it meets the right complexity
+        check_password = password_check(password)
 
+         # generate error messages if it doesnt pass
+        if True in check_password.values():
+            for k,v in check_password.items():
+                if str(v) == "True":
+                    flash(k, "warning")
+
+            return render_template('password-recovery.html', sitekey=sitekey)
+       
+        pw_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        user = db.session.query(User).filter_by(username=username).first()
+        user.password = pw_hash
+        db.session.commit()
+        
+        return render_template('password-recovered.html')
 
 
 @app.route('/logout')
@@ -982,7 +1111,7 @@ def invoice():
             
             for item in query.items:
                 f.write("<tr><td style='width: 25%'><span><strong>Description</strong><br />" + item.item_desc +"</span></td><td style='width: 25%'><span><strong>Price</strong><br />" + format_currency(str(item.item_price), 'USD', locale='en_US') + "</span></td><td style='width: 25%'><span><strong>Quantity</strong><br />" + str(item.item_quant) + "</span></td><td style='width: 25%'><span><strong>Total</strong><br />" + format_currency(str(item.amount), 'USD', locale='en_US') + "</span></td></tr>")
-                sum += item.amount
+                sum += float(item.amount)
                 
                 list_sum.append(sum)
                 counter += 1
@@ -1005,7 +1134,7 @@ def invoice():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -1087,7 +1216,7 @@ def invoice():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
@@ -1254,8 +1383,9 @@ def invoiceedit():
             db.session.delete(found_invoice_data)
             db.session.commit()
             
-            db.session.delete(found_invoice_items)
-            db.session.commit()
+            for item in found_invoice_items:
+                db.session.delete(item)
+                db.session.commit()
             
             db.session.delete(found_invoice_values)
             db.session.commit()
@@ -1610,7 +1740,7 @@ def invoiceedit():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -1692,7 +1822,7 @@ def invoiceedit():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
@@ -2179,7 +2309,7 @@ def invoicenumber():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -2261,7 +2391,7 @@ def invoicenumber():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
@@ -2899,7 +3029,7 @@ def invoicenumberbyein():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -2981,7 +3111,7 @@ def invoicenumberbyein():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
@@ -3467,7 +3597,7 @@ def invoicenumberresults():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -3549,7 +3679,7 @@ def invoicenumberresults():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
@@ -4035,7 +4165,7 @@ def invoicenumberbydate():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -4117,7 +4247,7 @@ def invoicenumberbydate():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
+                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
