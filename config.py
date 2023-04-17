@@ -3,8 +3,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
     # main config
-    SECRET_KEY = os.getenv['APP_SECRET_KEY']
-    SECURITY_PASSWORD_SALT = os.getenv['APP_SECURITY_PASSWORD_SALT']
+    SECRET_KEY = os.environ['APP_SECRET_KEY']
+    SECURITY_PASSWORD_SALT = os.environ['APP_SECURITY_PASSWORD_SALT']
     DEBUG = False
     BCRYPT_LOG_ROUNDS = 13
     WTF_CSRF_ENABLED = True
@@ -16,18 +16,18 @@ class Config(object):
     
 
     # gmail authentication
-    MAIL_USERNAME = os.getenv['APP_MAIL_USERNAME']
-    MAIL_PASSWORD = os.getenv['APP_MAIL_PASSWORD']
+    MAIL_USERNAME = os.environ['APP_MAIL_USERNAME']
+    MAIL_PASSWORD = os.environ['APP_MAIL_PASSWORD']
     # mail accounts
-    MAIL_DEFAULT_SENDER = os.getenv['APP_MAIL_USERNAME_SENDER']
-    RECAPTCHA_SITE_KEY = os.getenv['RECAPTCHA_KEY']
-    SECRET_SITE_KEY = os.getenv['SECRET_KEY_RECAPTCHA']
-    DROPBOX_ACCESS_TOKEN = os.getenv['DROPBOX_TOKEN']
+    MAIL_DEFAULT_SENDER = os.environ['APP_MAIL_USERNAME_SENDER']
+    RECAPTCHA_SITE_KEY = os.environ['RECAPTCHA_KEY']
+    SECRET_SITE_KEY = os.environ['SECRET_KEY_RECAPTCHA']
+    
 
     #SQLALCHEMY_DATABASE_URI = 'mysql://uolcg8z6xjblwsuq:DlBzAEijVaY886OcOjjZ@b5ick1tqoytd9ldsooyn-mysql.services.clever-cloud.com:3306/b5ick1tqoytd9ldsooyn'
     #SQLALCHEMY_DATABASE_URI = 'postgresql://fdjemxlb:3l8UnsKAzox30SfWcb2kGOG4w66YHyHe@queenie.db.elephantsql.com/fdjemxlb'
        
-    SQLALCHEMY_DATABASE_URI = os.getenv['DATABASE_URL']
+    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
 
 class ProductionConfig(Config):

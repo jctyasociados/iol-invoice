@@ -143,8 +143,6 @@ def contact():
             html += "</body></html>"
         
             body = html
-            port = 465
-            smtp_server = "smtp.gmail.com"
             email_username = app.config['MAIL_USERNAME']
             sender_email = app.config['MAIL_DEFAULT_SENDER']
             receiver_email = "jctyasociados@gmail.com"
@@ -161,10 +159,11 @@ def contact():
             message.attach(MIMEText(body, "html"))
 
             #text = message.as_string()
-            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-              context = ssl.create_default_context()
-              server.login(sender_email, password)
-              server.sendmail(sender_email, receiver_email, message)
+            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+            connection.starttls()
+            connection.login(email_username,password)
+            connection.send_message(message)
+            connection.quit()
         
             return render_template('contact-form-sent.html')
     
@@ -197,8 +196,6 @@ def appcontact():
             html += "</body></html>"
         
             body = html
-            port = 465  # For SSL
-            smtp_server = "smtp.gmail.com"
             email_username = app.config['MAIL_USERNAME']
             sender_email = app.config['MAIL_DEFAULT_SENDER']
             receiver_email = "jctyasociados@gmail.com"
@@ -215,11 +212,11 @@ def appcontact():
             message.attach(MIMEText(body, "html"))
 
             #text = message.as_string()
-            context = ssl.create_default_context()
-            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-                server.login(sender_email, password)
-                server.sendmail(sender_email, receiver_email, message)
-                server.quit()
+            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+            connection.starttls()
+            connection.login(email_username,password)
+            connection.send_message(message)
+            connection.quit()
         
         
             return render_template('app-contact-form-sent.html', user=current_user)
@@ -346,8 +343,6 @@ def send_html():
     file = open(app.config['UPLOAD_FOLDER'] + "/email" + name + ".html", "r")
     body = file.read()
     file.close()
-    port = 465  # For SSL
-    smtp_server = "smtp.gmail.com"
     email_username = app.config['MAIL_USERNAME']
     sender_email = app.config['MAIL_DEFAULT_SENDER']
     receiver_email = found_invoice_data.email
@@ -374,32 +369,33 @@ def send_html():
      
     metadata = dbx.files_download_to_file(app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf", "/iolcloud/" + name + ".pdf")
     
-    filename_app = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
+    filename = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
     
     # Open PDF file in binary mode
     
-    #pdfname = 'writings.pdf'
-
-    # open the file in bynary
-    binary_pdf = open(filename_app, 'rb')
-
-    payload = MIMEBase('application', 'octate-stream', Name=filename_app)
-    # payload = MIMEBase('application', 'pdf', Name=pdfname)
-    payload.set_payload((binary_pdf).read())
-
-    # enconding the binary into base64
-    encoders.encode_base64(payload)
-
-    # add header with pdf name
-    payload.add_header('Content-Decomposition', 'attachment', filename=filename_app)
-    message.attach(payload)
-    #text = message.as_string()
-
-    #use gmail with port
+    with open(filename, "rb") as attachment:
+        # Add file as application/octet-stream
+        # Email client can usually download this automatically as attachment
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(attachment.read())
+    	# Encode file in ASCII characters to send by email
+    encoders.encode_base64(part)
+    # Add header as key/value pair to attachment part
+    part.add_header(
+	"Content-Disposition",
+	f"attachment; filename= {filename}"
+	)
+	
+	# Add attachment to message and convert message to string
+    message.attach(part)
+    text = message.as_string()
+	
+    # Log in to server using secure context and send email
+	
     context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, message)
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(email_username, password)
+        server.sendmail(sender_email, receiver_email, text)
     return render_template('email_sent.html', user=current_user)    
 
 
@@ -452,48 +448,6 @@ def login():
         elif registered_user.username == username and bcrypt.check_password_hash(registered_user.password, password) == True and registered_user.confirmed == True:
     	    login_user(registered_user, remember=remember_me)  
         return redirect(request.args.get('next') or url_for('appindex'))
-
-@app.route("/login-confirmation", methods=["GET", "POST"])
-def login_confirmation():
-    
-
-
-    # clear the inital flash message
-    session.clear()
-    if request.method == 'GET':
-        return render_template('login-confirmation.html')
-    if request.method == 'POST':
-        # get the form data
-        username = request.form['username']
-        password = request.form['password']
-        
-         
-        remember_me = False
-        if 'remember_me' in request.form:
-            remember_me = True
-        
-        
-
-        # query the user
-        registered_user = User.query.filter_by(username=username).first()
-
-        # check the passwords
-        if registered_user is None:
-            flash("Invalid Username", "warning")
-            return render_template('login-confirmation.html')
-        
-        if registered_user.username == username and bcrypt.check_password_hash(registered_user.password, password) == False:
-    	    flash("Invalid Password", "warning")
-    	    return render_template('login-confirmation.html')
-        
-        # login the user
-        
-        if registered_user.username == username and bcrypt.check_password_hash(registered_user.password, password) == True and registered_user.confirmed == False:
-            flash("You have to confirm your email.", "warning")
-            return render_template('login-confirmation.html')
-        elif registered_user.username == username and bcrypt.check_password_hash(registered_user.password, password) == True and registered_user.confirmed == True:
-    	    login_user(registered_user, remember=remember_me)  
-        return redirect(request.args.get('next') or url_for('appindex'))
     
     	      	
 @app.route('/recover', methods=["GET", "POST"])
@@ -526,8 +480,6 @@ def recover():
 
       
       body = html
-      port = 465  # For SSL
-      smtp_server = "smtp.gmail.com"
       email_username = app.config['MAIL_USERNAME']
       sender_email = app.config['MAIL_DEFAULT_SENDER']
       password = app.config['MAIL_PASSWORD']
@@ -542,12 +494,14 @@ def recover():
       # Add body to email
       message.attach(MIMEText(body, "html"))
 
-      #text = message.as_string()
-      #use outlook with port
+      text = message.as_string()
+      # Send Email with Gmail
+      # Log in to server using secure context and send email      
       context = ssl.create_default_context()
-      with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, found_user.email, message)
+      with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            server.login(email_username, password)
+            server.sendmail(sender_email, found_user.email, text)
+      
 
       flash("A Reset Password email has been sent via email.", "success")
       return render_template('password-recover.html', sitekey=sitekey )
@@ -624,8 +578,6 @@ def register():
 
         subject = "Confirm Your Registration"
         body = html
-        port = 465  # For SSL
-        smtp_server = "smtp.gmail.com"
         email_username = app.config['MAIL_USERNAME']
         sender_email = app.config['MAIL_DEFAULT_SENDER']
         password = app.config['MAIL_PASSWORD']
@@ -642,12 +594,11 @@ def register():
 
         text = message.as_string()
 
+        # Log in to server using secure context and send email      
         context = ssl.create_default_context()
-        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-            server.login(sender_email, password)
-            text = message.as_string()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            server.login(email_username, password)
             server.sendmail(sender_email, user.email, text)
-            server.quit()
 
         flash("A confirmation email has been sent via email.", "success")
         return render_template('login.html', sitekey=sitekey )
@@ -670,7 +621,7 @@ def register():
     
 @app.route('/confirm/<token>')
 def confirm_email(token):
-    
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
     try:
         email = confirm_token(token)
     except:
@@ -687,7 +638,7 @@ def confirm_email(token):
         db.session.add(user)
         db.session.commit()
         flash('You have confirmed your account. Thanks!', 'success')
-    return render_template('login-confirmation.html')
+    return render_template('login.html', sitekey=sitekey)
     
 @app.route('/password-recovery/<token>')
 def password_reset(token):
@@ -1147,7 +1098,7 @@ def invoice():
             
             for item in query.items:
                 f.write("<tr><td style='width: 25%'><span><strong>Description</strong><br />" + item.item_desc +"</span></td><td style='width: 25%'><span><strong>Price</strong><br />" + format_currency(str(item.item_price), 'USD', locale='en_US') + "</span></td><td style='width: 25%'><span><strong>Quantity</strong><br />" + str(item.item_quant) + "</span></td><td style='width: 25%'><span><strong>Total</strong><br />" + format_currency(str(item.amount), 'USD', locale='en_US') + "</span></td></tr>")
-                sum += float(item.amount)
+                sum += item.amount
                 
                 list_sum.append(sum)
                 counter += 1
@@ -1170,7 +1121,7 @@ def invoice():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
+                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -1252,7 +1203,7 @@ def invoice():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
+                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
@@ -1419,9 +1370,8 @@ def invoiceedit():
             db.session.delete(found_invoice_data)
             db.session.commit()
             
-            for item in found_invoice_items:
-                db.session.delete(item)
-                db.session.commit()
+            db.session.delete(found_invoice_items)
+            db.session.commit()
             
             db.session.delete(found_invoice_values)
             db.session.commit()
@@ -1776,7 +1726,7 @@ def invoiceedit():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
+                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -1858,7 +1808,7 @@ def invoiceedit():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
+                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
@@ -2345,7 +2295,7 @@ def invoicenumber():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
+                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -2427,7 +2377,7 @@ def invoicenumber():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
+                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
@@ -3065,7 +3015,7 @@ def invoicenumberbyein():
                 list_number = len(list_sum) - 1
                 taxes = float(found_invoice_data.taxes)
                 subtotal = round(float(list_sum[list_number]), 2)
-                taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
+                taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
                 amount = round(float(subtotal + taxes), 2)
                 print(subtotal)
                 
@@ -3147,7 +3097,7 @@ def invoicenumberbyein():
                     list_number = len(list_sum) - 1
                     taxes = float(found_invoice_data.taxes)
                     subtotal = round(float(list_sum[list_number]), 2)
-                    taxes = round(float(list_sum[list_number] * float(taxes/100)), 2)
+                    taxes = round(float(list_sum[list_number] * (float(taxes/100))), 2)
                     amount = round(float(subtotal + taxes), 2)
                     print(subtotal)
                 
