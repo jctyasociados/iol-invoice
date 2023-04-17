@@ -31,9 +31,9 @@ app = Flask(__name__,
             static_folder='static')
 
 
-#app.config.from_object(os.environ['APP_SETTINGS'])
+app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+modus = Modus(app)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 moment = Moment()
@@ -51,7 +51,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 path = os.getcwd()
 # file Upload
-UPLOAD_FOLDER = os.path.join(path, 'uploads')
+UPLOAD_FOLDER = os.path.join(path, 'static/uploads')
 
 if not os.path.isdir(UPLOAD_FOLDER):
     os.mkdir(UPLOAD_FOLDER)
@@ -143,8 +143,6 @@ def contact():
             html += "</body></html>"
         
             body = html
-            port = 465
-            smtp_server = "smtp.gmail.com"
             email_username = app.config['MAIL_USERNAME']
             sender_email = app.config['MAIL_DEFAULT_SENDER']
             receiver_email = "jctyasociados@gmail.com"
@@ -161,10 +159,11 @@ def contact():
             message.attach(MIMEText(body, "html"))
 
             #text = message.as_string()
-            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-              context = ssl.create_default_context()
-              server.login(sender_email, password)
-              server.sendmail(sender_email, receiver_email, message)
+            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+            connection.starttls()
+            connection.login(email_username,password)
+            connection.send_message(message)
+            connection.quit()
         
             return render_template('contact-form-sent.html')
     
@@ -197,8 +196,6 @@ def appcontact():
             html += "</body></html>"
         
             body = html
-            port = 465  # For SSL
-            smtp_server = "smtp.gmail.com"
             email_username = app.config['MAIL_USERNAME']
             sender_email = app.config['MAIL_DEFAULT_SENDER']
             receiver_email = "jctyasociados@gmail.com"
@@ -215,11 +212,11 @@ def appcontact():
             message.attach(MIMEText(body, "html"))
 
             #text = message.as_string()
-            context = ssl.create_default_context()
-            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-                server.login(sender_email, password)
-                server.sendmail(sender_email, receiver_email, message)
-                server.quit()
+            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+            connection.starttls()
+            connection.login(email_username,password)
+            connection.send_message(message)
+            connection.quit()
         
         
             return render_template('app-contact-form-sent.html', user=current_user)
@@ -272,7 +269,7 @@ def upload():
                 image.save(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = image.size
                    
-            upload_path = "uploads"
+            upload_path = app.config['UPLOAD_FOLDER']
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -346,8 +343,7 @@ def send_html():
     file = open(app.config['UPLOAD_FOLDER'] + "/email" + name + ".html", "r")
     body = file.read()
     file.close()
-    port = 465  # For SSL
-    smtp_server = "smtp.gmail.com"
+    
     email_username = app.config['MAIL_USERNAME']
     sender_email = app.config['MAIL_DEFAULT_SENDER']
     receiver_email = found_invoice_data.email
@@ -396,19 +392,22 @@ def send_html():
     #text = message.as_string()
 
     #use gmail with port
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, message)
+    connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+    connection.starttls()
+    connection.login(email_username,password)
+    connection.send_message(message)
+    connection.quit()
     return render_template('email_sent.html', user=current_user)    
 
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    
     sitekey = app.config['RECAPTCHA_SITE_KEY']
-    
+
+
+    # clear the inital flash message
+    session.clear()
     if request.method == 'GET':
         return render_template('login.html', sitekey=sitekey)
     if request.method == 'POST':
@@ -450,48 +449,6 @@ def login():
         elif registered_user.username == username and bcrypt.check_password_hash(registered_user.password, password) == True and registered_user.confirmed == True:
     	    login_user(registered_user, remember=remember_me)  
         return redirect(request.args.get('next') or url_for('appindex'))
-
-@app.route("/login-confirmation", methods=["GET", "POST"])
-def login_confirmation():
-    
-
-
-    # clear the inital flash message
-    session.clear()
-    if request.method == 'GET':
-        return render_template('login-confirmation.html')
-    if request.method == 'POST':
-        # get the form data
-        username = request.form['username']
-        password = request.form['password']
-        
-         
-        remember_me = False
-        if 'remember_me' in request.form:
-            remember_me = True
-        
-        
-
-        # query the user
-        registered_user = User.query.filter_by(username=username).first()
-
-        # check the passwords
-        if registered_user is None:
-            flash("Invalid Username", "warning")
-            return render_template('login-confirmation.html')
-        
-        if registered_user.username == username and bcrypt.check_password_hash(registered_user.password, password) == False:
-    	    flash("Invalid Password", "warning")
-    	    return render_template('login-confirmation.html')
-        
-        # login the user
-        
-        if registered_user.username == username and bcrypt.check_password_hash(registered_user.password, password) == True and registered_user.confirmed == False:
-            flash("You have to confirm your email.", "warning")
-            return render_template('login-confirmation.html')
-        elif registered_user.username == username and bcrypt.check_password_hash(registered_user.password, password) == True and registered_user.confirmed == True:
-    	    login_user(registered_user, remember=remember_me)  
-        return redirect(request.args.get('next') or url_for('appindex'))
     
     	      	
 @app.route('/recover', methods=["GET", "POST"])
@@ -524,8 +481,6 @@ def recover():
 
       
       body = html
-      port = 465  # For SSL
-      smtp_server = "smtp.gmail.com"
       email_username = app.config['MAIL_USERNAME']
       sender_email = app.config['MAIL_DEFAULT_SENDER']
       password = app.config['MAIL_PASSWORD']
@@ -542,10 +497,17 @@ def recover():
 
       #text = message.as_string()
       #use outlook with port
-      context = ssl.create_default_context()
-      with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, found_user.email, message)
+      sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
+      sessionsmtp.ehlo()
+      #enable security
+      sessionsmtp.starttls()
+
+      #login with mail_id and password
+      sessionsmtp.login(email_username, password)
+
+      text = message.as_string()
+      sessionsmtp.sendmail(sender_email, found_user.email, text)
+      sessionsmtp.quit()
 
       flash("A Reset Password email has been sent via email.", "success")
       return render_template('password-recover.html', sitekey=sitekey )
@@ -622,8 +584,6 @@ def register():
 
         subject = "Confirm Your Registration"
         body = html
-        port = 465  # For SSL
-        smtp_server = "smtp.gmail.com"
         email_username = app.config['MAIL_USERNAME']
         sender_email = app.config['MAIL_DEFAULT_SENDER']
         password = app.config['MAIL_PASSWORD']
@@ -640,12 +600,18 @@ def register():
 
         text = message.as_string()
 
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-            server.login(sender_email, password)
-            text = message.as_string()
-            server.sendmail(sender_email, user.email, text)
-            server.quit()
+        #use outlook with port
+        sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
+        sessionsmtp.ehlo()
+        #enable security
+        sessionsmtp.starttls()
+
+        #login with mail_id and password
+        sessionsmtp.login(email_username, password)
+
+        text = message.as_string()
+        sessionsmtp.sendmail(sender_email, user.email, text)
+        sessionsmtp.quit()
 
         flash("A confirmation email has been sent via email.", "success")
         return render_template('login.html', sitekey=sitekey )
@@ -668,7 +634,7 @@ def register():
     
 @app.route('/confirm/<token>')
 def confirm_email(token):
-    
+    sitekey = app.config['RECAPTCHA_SITE_KEY']
     try:
         email = confirm_token(token)
     except:
@@ -685,7 +651,7 @@ def confirm_email(token):
         db.session.add(user)
         db.session.commit()
         flash('You have confirmed your account. Thanks!', 'success')
-    return render_template('login-confirmation.html')
+    return render_template('login.html', sitekey=sitekey)
     
 @app.route('/password-recovery/<token>')
 def password_reset(token):
@@ -855,7 +821,7 @@ def invoice():
             width, height = image.size
             
             #print(width, height)
-            finalimagename=name+"qrcode.png" 
+            finalimagename=name+"qrcode"+".png" 
             basewidth = 150
             if width > 150:
                 img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], destination))
@@ -866,7 +832,7 @@ def invoice():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "uploads"
+            upload_path = "static/uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -1472,7 +1438,7 @@ def invoiceedit():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "uploads"
+            upload_path = "static/uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -2041,7 +2007,7 @@ def invoicenumber():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "uploads"
+            upload_path = "static/uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -2761,7 +2727,7 @@ def invoicenumberbyein():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "uploads"
+            upload_path = "static/uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -3329,7 +3295,7 @@ def invoicenumberresults():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "uploads"
+            upload_path = "static/uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -3897,7 +3863,7 @@ def invoicenumberbydate():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "uploads"
+            upload_path = "static/uploads"
             os.chdir(upload_path)
             os.remove(destination)
             

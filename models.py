@@ -60,17 +60,17 @@ class User(db.Model):
         else:
             return -3
             
-        def serialize(self):
-            return {
-            'id': self.id, 
-            'username': self.username,
-            'user_id_hash': self.user_id_hash,
-            'password': self.password,
-            'email': self.email,
-            'confirmed' : self.confirmed,
-            'confirmed_on' : self.confirmed_on,
-            'registered_on': self.registered_on
-            }
+    def serialize(self):
+        return {
+        'id': self.id,
+        'username': self.username,
+        'user_id_hash': self.user_id_hash,
+        'password': self.password,
+        'email': self.email,
+        'confirmed' : self.confirmed,
+        'confirmed_on' : self.confirmed_on,
+        'registered_on': self.registered_on
+        }
             
 class ImageData(db.Model):
     __tablename__ = "imagedata"
