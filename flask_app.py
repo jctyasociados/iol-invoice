@@ -33,6 +33,7 @@ app = Flask(__name__,
 
 #app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = app.config['SECRET_KEY']
 modus = Modus(app)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -4485,7 +4486,6 @@ def password_check(password):
     
         
 if __name__ == "__main__":
-    app.secret_key = app.config['SECRET_KEY']
     app.run()
 
                
