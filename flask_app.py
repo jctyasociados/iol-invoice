@@ -823,7 +823,7 @@ def invoice():
             os.chdir(upload_path)
             os.remove(destination)
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             transferData = TransferData(access_token)
             
             file_from = finalimagename
@@ -971,7 +971,7 @@ def invoice():
             f.write("</table></td></tr></table>")
             f.close()            
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             
             dbx = dropbox.Dropbox(access_token)
             found_html_template_data = db.session.query(TemplateHTMLData).filter_by(user_id=(user_hashed)).all()
@@ -1293,7 +1293,7 @@ def invoice():
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             
             dbx = dropbox.Dropbox(access_token)
             found_template_data = db.session.query(TemplateData).filter_by(user_id=(user_hashed)).all()
@@ -1428,7 +1428,7 @@ def invoiceedit():
             os.chdir(upload_path)
             os.remove(destination)
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             transferData = TransferData(access_token)
             
             file_from = finalimagename
@@ -1576,7 +1576,7 @@ def invoiceedit():
             f.write("</table></td></tr></table>")
             f.close()            
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             
             dbx = dropbox.Dropbox(access_token)
             found_html_template_data = db.session.query(TemplateHTMLData).filter_by(user_id=(user_hashed)).all()
@@ -1898,7 +1898,7 @@ def invoiceedit():
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             
             dbx = dropbox.Dropbox(access_token)
             found_template_data = db.session.query(TemplateData).filter_by(user_id=(user_hashed)).all()
@@ -1997,7 +1997,7 @@ def invoicenumber():
             os.chdir(upload_path)
             os.remove(destination)
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             transferData = TransferData(access_token)
             
             file_from = finalimagename
@@ -2145,7 +2145,7 @@ def invoicenumber():
             f.write("</table></td></tr></table>")
             f.close()            
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             
             dbx = dropbox.Dropbox(access_token)
             found_html_template_data = db.session.query(TemplateHTMLData).filter_by(user_id=(user_hashed)).all()
@@ -2467,7 +2467,7 @@ def invoicenumber():
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             
             dbx = dropbox.Dropbox(access_token)
             found_template_data = db.session.query(TemplateData).filter_by(user_id=(user_hashed)).all()
@@ -2717,7 +2717,7 @@ def invoicenumberbyein():
             os.chdir(upload_path)
             os.remove(destination)
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             transferData = TransferData(access_token)
             
             file_from = finalimagename
@@ -2865,7 +2865,7 @@ def invoicenumberbyein():
             f.write("</table></td></tr></table>")
             f.close()            
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             
             dbx = dropbox.Dropbox(access_token)
             found_html_template_data = db.session.query(TemplateHTMLData).filter_by(user_id=(user_hashed)).all()
@@ -3187,7 +3187,7 @@ def invoicenumberbyein():
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
             
-            access_token = 'cnX-updmdekAAAAAAAAAASkEbkYdKaLrD3o7Z7Pc7C7o7dPFnPzZmikuNdXxJI1J'
+            access_token = app.config['DROPBOX_ACCESS_TOKEN']
             
             dbx = dropbox.Dropbox(access_token)
             found_template_data = db.session.query(TemplateData).filter_by(user_id=(user_hashed)).all()
