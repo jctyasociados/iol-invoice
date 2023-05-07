@@ -51,10 +51,10 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 path = os.getcwd()
 # file Upload
-UPLOAD_FOLDER = os.path.join(path, 'static/uploads')
+UPLOAD_FOLDER = os.path.join(path, 'uploads')
 
-"""if not os.path.isdir(UPLOAD_FOLDER):
-    os.mkdir(UPLOAD_FOLDER)"""
+if not os.path.isdir(UPLOAD_FOLDER):
+    os.mkdir(UPLOAD_FOLDER)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -269,7 +269,7 @@ def upload():
                 image.save(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = image.size
                    
-            upload_path = app.config['UPLOAD_FOLDER']
+            upload_path = "uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -377,7 +377,7 @@ def send_html():
     #pdfname = 'writings.pdf'
 
     # open the file in bynary
-    """binary_pdf = open(filename_app, 'rb')
+    binary_pdf = open(filename_app, 'rb')
 
     payload = MIMEBase('application', 'octate-stream', Name=filename_app)
     # payload = MIMEBase('application', 'pdf', Name=pdfname)
@@ -396,30 +396,7 @@ def send_html():
     connection.starttls()
     connection.login(email_username,password)
     connection.send_message(message)
-    connection.quit()"""
-
-    with open(filename_app, "rb") as attachment:
-        # Add the attachment to the message
-        part = MIMEBase("application", "octet-stream")
-        part.set_payload((attachment).read())
-        encoders.encode_base64(part)
-        part.add_header(
-        "Content-Disposition",
-        f"attachment; filename={os.path.basename(filename_app)}",)
-
-    message = MIMEMultipart()
-    message['Subject'] = subject
-    message['From'] = sender_email
-    message['To'] = receiver_email
-    html_part = MIMEText(body)
-    message.attach(html_part)
-    message.attach(part)
-
-    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-    server.login(email_username, password)
-    server.sendmail(sender_email, receiver_email, message.as_string())
-    server.quit()
-
+    connection.quit()
     return render_template('email_sent.html', user=current_user)    
 
 
@@ -623,10 +600,18 @@ def register():
 
         text = message.as_string()
 
-        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        smtp_server.login(email_username, password)
-        smtp_server.sendmail(sender_email, user.email, text)
-        smtp_server.quit()
+        #use outlook with port
+        sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
+        sessionsmtp.ehlo()
+        #enable security
+        sessionsmtp.starttls()
+
+        #login with mail_id and password
+        sessionsmtp.login(email_username, password)
+
+        text = message.as_string()
+        sessionsmtp.sendmail(sender_email, user.email, text)
+        sessionsmtp.quit()
 
         flash("A confirmation email has been sent via email.", "success")
         return render_template('login.html', sitekey=sitekey )
@@ -836,7 +821,7 @@ def invoice():
             width, height = image.size
             
             #print(width, height)
-            finalimagename=name+"qrcode"+".png" 
+            finalimagename=name+"qrcode.png" 
             basewidth = 150
             if width > 150:
                 img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], destination))
@@ -847,7 +832,7 @@ def invoice():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "static/uploads"
+            upload_path = "uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -1453,7 +1438,7 @@ def invoiceedit():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "static/uploads"
+            upload_path = "uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -2022,7 +2007,7 @@ def invoicenumber():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "static/uploads"
+            upload_path = "uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -2742,7 +2727,7 @@ def invoicenumberbyein():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "static/uploads"
+            upload_path = "uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -3310,7 +3295,7 @@ def invoicenumberresults():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "static/uploads"
+            upload_path = "uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
@@ -3878,7 +3863,7 @@ def invoicenumberbydate():
                 new__image = PIL.Image.open(os.path.join(app.config['UPLOAD_FOLDER'], finalimagename))
                 width, height = new__image.size
                 
-            upload_path = "static/uploads"
+            upload_path = "uploads"
             os.chdir(upload_path)
             os.remove(destination)
             
