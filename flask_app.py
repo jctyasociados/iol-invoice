@@ -217,11 +217,16 @@ def appcontact():
             message.attach(MIMEText(body, "html"))
 
             #text = message.as_string()
-            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+            """connection = smtplib.SMTP(host='smtp.office365.com', port=587)
             connection.starttls()
             connection.login(email_username,password)
             connection.send_message(message)
-            connection.quit()
+            connection.quit()"""
+
+            server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+            server.login(email_username, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+            server.quit()
         
         
             return render_template('app-contact-form-sent.html', user=current_user)
@@ -397,11 +402,17 @@ def send_html():
     #text = message.as_string()
 
     #use gmail with port
-    connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+    """connection = smtplib.SMTP(host='smtp.office365.com', port=587)
     connection.starttls()
     connection.login(email_username,password)
     connection.send_message(message)
-    connection.quit()
+    connection.quit()"""
+
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    server.login(email_username, password)
+    server.sendmail(sender_email, receiver_email, message.as_string())
+    server.quit()
+
     return render_template('email_sent.html', user=current_user)    
 
 
@@ -502,7 +513,7 @@ def recover():
 
       #text = message.as_string()
       #use outlook with port
-      sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
+      """sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
       sessionsmtp.ehlo()
       #enable security
       sessionsmtp.starttls()
@@ -512,7 +523,12 @@ def recover():
 
       text = message.as_string()
       sessionsmtp.sendmail(sender_email, found_user.email, text)
-      sessionsmtp.quit()
+      sessionsmtp.quit()"""
+
+      server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+      server.login(email_username, password)
+      server.sendmail(sender_email, found_user.email, message.as_string())
+      server.quit()
 
       flash("A Reset Password email has been sent via email.", "success")
       return render_template('password-recover.html', sitekey=sitekey )
@@ -606,7 +622,7 @@ def register():
         text = message.as_string()
 
         #use outlook with port
-        sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
+        """sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
         sessionsmtp.ehlo()
         #enable security
         sessionsmtp.starttls()
@@ -616,7 +632,14 @@ def register():
 
         text = message.as_string()
         sessionsmtp.sendmail(sender_email, user.email, text)
-        sessionsmtp.quit()
+        sessionsmtp.quit()"""
+
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.login(email_username, password)
+        server.sendmail(sender_email, user.email, message.as_string())
+        server.quit()
+
+
 
         flash("A confirmation email has been sent via email.", "success")
         return render_template('login.html', sitekey=sitekey )
