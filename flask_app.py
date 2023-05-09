@@ -31,7 +31,7 @@ app = Flask(__name__,
             static_folder='static')
 
 
-app.config.from_object(os.getenv("APP_SETTINGS"))
+app.config.from_object(os.getenv['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 modus = Modus(app)
 db = SQLAlchemy(app)
@@ -159,11 +159,16 @@ def contact():
             message.attach(MIMEText(body, "html"))
 
             #text = message.as_string()
-            connection = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
+            """"connection = smtplib.SMTP(host='smtp.office365.com', port=587)
             connection.starttls()
             connection.login(email_username,password)
             connection.send_message(message)
-            connection.quit()
+            connection.quit()"""
+
+            server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+            server.login(email_username, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+            server.quit()
         
             return render_template('contact-form-sent.html')
     
@@ -212,7 +217,7 @@ def appcontact():
             message.attach(MIMEText(body, "html"))
 
             #text = message.as_string()
-            connection = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
+            connection = smtplib.SMTP(host='smtp.office365.com', port=587)
             connection.starttls()
             connection.login(email_username,password)
             connection.send_message(message)
@@ -392,7 +397,7 @@ def send_html():
     #text = message.as_string()
 
     #use gmail with port
-    connection = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
+    connection = smtplib.SMTP(host='smtp.office365.com', port=587)
     connection.starttls()
     connection.login(email_username,password)
     connection.send_message(message)
@@ -497,7 +502,7 @@ def recover():
 
       #text = message.as_string()
       #use outlook with port
-      sessionsmtp = smtplib.SMTP('smtp-mail.outlook.com', 587)
+      sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
       sessionsmtp.ehlo()
       #enable security
       sessionsmtp.starttls()
@@ -601,7 +606,7 @@ def register():
         text = message.as_string()
 
         #use outlook with port
-        sessionsmtp = smtplib.SMTP('smtp-mail.outlook.com', 587)
+        sessionsmtp = smtplib.SMTP('smtp.office365.com', 587)
         sessionsmtp.ehlo()
         #enable security
         sessionsmtp.starttls()
