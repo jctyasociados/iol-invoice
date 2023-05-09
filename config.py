@@ -3,7 +3,7 @@ import os
 
 basedir = "/home/iolenterprises/iol-invoice-pythonanywhere"
 
-class Config(object"):
+class Config(object):
     # main config
     SECRET_KEY = os.getenv("APP_SECRET_KEY")
     SECURITY_PASSWORD_SALT = os.getenv("APP_SECURITY_PASSWORD_SALT")
