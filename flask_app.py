@@ -31,7 +31,7 @@ app = Flask(__name__,
             static_folder='static')
 
 
-app.config.from_object(os.getenv(APP_SETTINGS))
+app.config.from_object(os.getenv("APP_SETTINGS"))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 modus = Modus(app)
 db = SQLAlchemy(app)
