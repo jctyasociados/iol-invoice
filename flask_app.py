@@ -1079,7 +1079,7 @@ def invoice():
             <tr> \
             <td style='vertical-align: top;' width='50%'> \
             <span>here goes image</span> \
-            <img src='https:" + found_image_data.image_url("?raw=1","?dl=0") + "' alt='Logo'> \
+            <img src='https:" + found_image_data.image_url.("?raw=1","?dl=0") + "' alt='Logo'> \
             </td> \
             <td style='vertical-align: top; text-align:right;' width='50%'> \
             <span style='text-align:right;'>" + found_profile_data.businessname + "</span><br /> \
