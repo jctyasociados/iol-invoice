@@ -892,7 +892,7 @@ def invoice():
            
             name_url=result.replace("https:","")
             name_url_final=name_url.replace("?dl=0","?raw=1")
-            name_url_pdf=
+            
             print(result)
             print(name_url)  
 
