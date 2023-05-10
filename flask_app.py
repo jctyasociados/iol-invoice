@@ -344,6 +344,7 @@ def send_html():
     user_hashed=current_user.user_id_hash
     name=user_hashed
     name=name.replace("/","$$$")
+    name=name.replace(".","$$$")
     
     access_token = app.config['DROPBOX_ACCESS_TOKEN']
 
@@ -375,6 +376,7 @@ def send_html():
     
     name=user_hashed
     name=name.replace("/","$$$")
+    name=name.replace(".","$$$")
     
     access_token = app.config['DROPBOX_ACCESS_TOKEN']
 
@@ -839,6 +841,7 @@ def invoice():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
+            name=name.replace(".","$$$")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -919,6 +922,7 @@ def invoice():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -1332,6 +1336,7 @@ def invoice():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
@@ -1445,6 +1450,7 @@ def invoiceedit():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
+            name=name.replace(".","$$$")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -1525,6 +1531,7 @@ def invoiceedit():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -1938,6 +1945,7 @@ def invoiceedit():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
@@ -2014,6 +2022,7 @@ def invoicenumber():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
+            name=name.replace(".","$$$")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -2094,6 +2103,7 @@ def invoicenumber():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -2507,6 +2517,7 @@ def invoicenumber():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
@@ -2734,6 +2745,7 @@ def invoicenumberbyein():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
+            name=name.replace(".","$$$")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -2814,6 +2826,7 @@ def invoicenumberbyein():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -3227,6 +3240,7 @@ def invoicenumberbyein():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
@@ -3302,6 +3316,7 @@ def invoicenumberresults():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
+            name=name.replace(".","$$$")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -3382,6 +3397,7 @@ def invoicenumberresults():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -3795,6 +3811,7 @@ def invoicenumberresults():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
@@ -3870,6 +3887,7 @@ def invoicenumberbydate():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
+            name=name.replace(".","$$$")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -3950,6 +3968,7 @@ def invoicenumberbydate():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -4363,6 +4382,7 @@ def invoicenumberbydate():
             
             name=user_hashed
             name=name.replace("/","$$$") 
+            name=name.replace(".","$$$")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
