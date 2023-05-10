@@ -1053,7 +1053,8 @@ def invoice():
             db.session.add(new_template)
             db.session.commit()           
             found_html_template_data = db.session.query(TemplateHTMLData).filter_by(user_id=(user_hashed)).first()
-            logo_image_pdf=found_image_data.image_url.replace("?raw=1","?dl=0")
+            logo_image_pdf=found_image_data.image_url
+            logo_image_pdf_final=logo_image_pdf.replace("?raw=1","?dl=0")
             
             f=open("uploads/" + name + ".html","w")
             f.write("<html><head> \
@@ -1079,7 +1080,7 @@ def invoice():
             <tr> \
             <td style='vertical-align: top;' width='50%'> \
             <span>here goes image</span> \
-            <img src='https:" + logo_image_pdf + "' alt='Logo'> \
+            <img src='https:" + logo_image_pdf_final + "' alt='Logo'> \
             </td> \
             <td style='vertical-align: top; text-align:right;' width='50%'> \
             <span style='text-align:right;'>" + found_profile_data.businessname + "</span><br /> \
