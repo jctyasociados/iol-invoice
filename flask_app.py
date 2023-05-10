@@ -1053,7 +1053,7 @@ def invoice():
             db.session.add(new_template)
             db.session.commit()           
             found_html_template_data = db.session.query(TemplateHTMLData).filter_by(user_id=(user_hashed)).first()
-            logo_image_pdf=found_image_data.image_url.("?raw=1","?dl=0")
+            logo_image_pdf=found_image_data.image_url.replace("?raw=1","?dl=0")
             
             f=open("uploads/" + name + ".html","w")
             f.write("<html><head> \
