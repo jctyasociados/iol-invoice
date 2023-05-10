@@ -933,7 +933,7 @@ def invoice():
             <table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px;'> \
             <tr> \
             <td style='vertical-align: top;' width='50%'> \
-            <img src='" + found_image_data.image_url + "' alt='Logo'> \
+            <img src='https:" + found_image_data.image_url + "' alt='Logo'> \
             </td> \
             <td style='vertical-align: top; text-align:right;' width='50%'> \
             <span style='text-align:right;'>" + found_profile_data.businessname + "</span><br /> \
@@ -1076,6 +1076,7 @@ def invoice():
             <table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px;' id='header_content'> \
             <tr> \
             <td style='vertical-align: top;' width='50%'> \
+            <span>here goes image</span> \
             <img src='https:" + found_image_data.image_url + "' alt='Logo'> \
             </td> \
             <td style='vertical-align: top; text-align:right;' width='50%'> \
