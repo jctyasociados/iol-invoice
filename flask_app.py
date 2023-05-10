@@ -309,6 +309,7 @@ def upload():
            
             name_url=result.replace("https:","")
             name_url_final=name_url.replace("?dl=0","?raw=1")
+            name_url_pdf=result.replace("?dl=0","?raw=1")
             
             os.chdir(r"..")
             
@@ -891,6 +892,7 @@ def invoice():
            
             name_url=result.replace("https:","")
             name_url_final=name_url.replace("?dl=0","?raw=1")
+            #name_url_pdf=result.replace("?dl=0","?raw=1")
             print(result)
             print(name_url)  
 
@@ -1077,7 +1079,7 @@ def invoice():
             <tr> \
             <td style='vertical-align: top;' width='50%'> \
             <span>here goes image</span> \
-            <img src='https:" + found_image_data.image_url + "' alt='Logo'> \
+            <img src='" + found_image_data.image_url + "' alt='Logo'> \
             </td> \
             <td style='vertical-align: top; text-align:right;' width='50%'> \
             <span style='text-align:right;'>" + found_profile_data.businessname + "</span><br /> \
