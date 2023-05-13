@@ -894,7 +894,7 @@ def invoice():
             name_url_final=name_url.replace("?dl=0","?raw=1")
             
             print(result)
-            print(name_url)  
+            print(name_url_final)  
 
 
         
@@ -928,7 +928,7 @@ def invoice():
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
-            f=open("uploads/email" + name + ".html","w")
+            f=open("uploads" + "email" + name + ".html","w")
             f.write("<html><head> \
             </head> \
             <body style='font-family: Arial, Helvetica, Verdana; font-size: 14px;'> \
@@ -944,10 +944,10 @@ def invoice():
             <span style='text-align:right;'>" + found_profile_data.address1 + "</span><br />")
             f.close()
             if found_profile_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span>" + found_profile_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:right;'>" + found_profile_data.city + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.state + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.zip + "</span> \
             </td> \
             </tr> \
@@ -971,10 +971,10 @@ def invoice():
             <span style='text-align:left;'>" + found_invoice_data.address + "</span><br />")
             f.close()
             if found_invoice_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip + "</span> \
             </td> \
             <td style='vertical-align: top; text-align:left;' width='50%'> \
@@ -984,10 +984,10 @@ def invoice():
             <span style='text-align:left;'>" + found_invoice_data.address_shipping + "</span><br />")
             f.close()
             if found_invoice_data.address2_shipping != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2_shipping + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip_shipping + "</span> \
             </td> \
             </tr> \
@@ -997,26 +997,26 @@ def invoice():
             </table> \
             <table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             for item in found_invoice_items:
                 f.write("<tr><td style='width: 25%;'><p><strong>Description</strong></p><p>" + item.item_desc +"</p></td><td style='width: 25%;'><p><strong>Price</strong></p><p>" + format_currency(str(item.item_price), 'USD', locale='en_US') + "</p></td><td style='width: 25%;'><p><strong>Quantity</strong></p><p>" + str(item.item_quant) + "</p></td><td style='width: 25%;'><p><strong>Total</strong></p><p>" + format_currency(str(item.amount), 'USD', locale='en_US') + "</p></td></tr>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'> \
             <tr><td style='width: 50%'>" + "<img src='https:" + found_qrcode_data.image_url + "' alt='QRcode'>" + "</td><td style='width: 50%'><table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<tr><td style='width: 50%'><strong>Subtotal</strong></td><td style='width:[] 50%'>" + format_currency(str(found_invoice_values.subtotal), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Taxes</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.taxes), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Total</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.total), 'USD', locale='en_US') + "</td></tr>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table></td></tr></table>")
             f.close()            
             
@@ -1539,7 +1539,7 @@ def invoiceedit():
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
-            f=open("uploads/email" + name + ".html","w")
+            f=open("uploads" + "email" + name + ".html","w")
             f.write("<html><head> \
             </head> \
             <body style='font-family: Arial, Helvetica, Verdana; font-size: 14px;'> \
@@ -1555,10 +1555,10 @@ def invoiceedit():
             <span style='text-align:right;'>" + found_profile_data.address1 + "</span><br />")
             f.close()
             if found_profile_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span>" + found_profile_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:right;'>" + found_profile_data.city + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.state + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.zip + "</span> \
             </td> \
             </tr> \
@@ -1582,10 +1582,10 @@ def invoiceedit():
             <span style='text-align:left;'>" + found_invoice_data.address + "</span><br />")
             f.close()
             if found_invoice_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip + "</span> \
             </td> \
             <td style='vertical-align: top; text-align:left;' width='50%'> \
@@ -1595,10 +1595,10 @@ def invoiceedit():
             <span style='text-align:left;'>" + found_invoice_data.address_shipping + "</span><br />")
             f.close()
             if found_invoice_data.address2_shipping != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2_shipping + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip_shipping + "</span> \
             </td> \
             </tr> \
@@ -1608,26 +1608,26 @@ def invoiceedit():
             </table> \
             <table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             for item in found_invoice_items:
                 f.write("<tr><td style='width: 25%;'><p><strong>Description</strong></p><p>" + item.item_desc +"</p></td><td style='width: 25%;'><p><strong>Price</strong></p><p>" + format_currency(str(item.item_price), 'USD', locale='en_US') + "</p></td><td style='width: 25%;'><p><strong>Quantity</strong></p><p>" + str(item.item_quant) + "</p></td><td style='width: 25%;'><p><strong>Total</strong></p><p>" + format_currency(str(item.amount), 'USD', locale='en_US') + "</p></td></tr>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'> \
             <tr><td style='width: 50%'>" + "<img src='https:" + found_qrcode_data.image_url + "' alt='QRcode'>" + "</td><td style='width: 50%'><table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<tr><td style='width: 50%'><strong>Subtotal</strong></td><td style='width:[] 50%'>" + format_currency(str(found_invoice_values.subtotal), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Taxes</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.taxes), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Total</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.total), 'USD', locale='en_US') + "</td></tr>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table></td></tr></table>")
             f.close()            
             
@@ -2111,7 +2111,7 @@ def invoicenumber():
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
-            f=open("uploads/email" + name + ".html","w")
+            f=open("uploads" + "email" + name + ".html","w")
             f.write("<html><head> \
             </head> \
             <body style='font-family: Arial, Helvetica, Verdana; font-size: 14px;'> \
@@ -2127,10 +2127,10 @@ def invoicenumber():
             <span style='text-align:right;'>" + found_profile_data.address1 + "</span><br />")
             f.close()
             if found_profile_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span>" + found_profile_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:right;'>" + found_profile_data.city + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.state + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.zip + "</span> \
             </td> \
             </tr> \
@@ -2154,10 +2154,10 @@ def invoicenumber():
             <span style='text-align:left;'>" + found_invoice_data.address + "</span><br />")
             f.close()
             if found_invoice_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip + "</span> \
             </td> \
             <td style='vertical-align: top; text-align:left;' width='50%'> \
@@ -2167,10 +2167,10 @@ def invoicenumber():
             <span style='text-align:left;'>" + found_invoice_data.address_shipping + "</span><br />")
             f.close()
             if found_invoice_data.address2_shipping != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2_shipping + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip_shipping + "</span> \
             </td> \
             </tr> \
@@ -2180,26 +2180,26 @@ def invoicenumber():
             </table> \
             <table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             for item in found_invoice_items:
                 f.write("<tr><td style='width: 25%;'><p><strong>Description</strong></p><p>" + item.item_desc +"</p></td><td style='width: 25%;'><p><strong>Price</strong></p><p>" + format_currency(str(item.item_price), 'USD', locale='en_US') + "</p></td><td style='width: 25%;'><p><strong>Quantity</strong></p><p>" + str(item.item_quant) + "</p></td><td style='width: 25%;'><p><strong>Total</strong></p><p>" + format_currency(str(item.amount), 'USD', locale='en_US') + "</p></td></tr>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'> \
             <tr><td style='width: 50%'>" + "<img src='https:" + found_qrcode_data.image_url + "' alt='QRcode'>" + "</td><td style='width: 50%'><table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<tr><td style='width: 50%'><strong>Subtotal</strong></td><td style='width:[] 50%'>" + format_currency(str(found_invoice_values.subtotal), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Taxes</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.taxes), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Total</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.total), 'USD', locale='en_US') + "</td></tr>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table></td></tr></table>")
             f.close()            
             
@@ -2834,7 +2834,7 @@ def invoicenumberbyein():
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
-            f=open("uploads/email" + name + ".html","w")
+            f=open("uploads" + "email" + name + ".html","w")
             f.write("<html><head> \
             </head> \
             <body style='font-family: Arial, Helvetica, Verdana; font-size: 14px;'> \
@@ -2850,10 +2850,10 @@ def invoicenumberbyein():
             <span style='text-align:right;'>" + found_profile_data.address1 + "</span><br />")
             f.close()
             if found_profile_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span>" + found_profile_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:right;'>" + found_profile_data.city + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.state + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.zip + "</span> \
             </td> \
             </tr> \
@@ -2877,10 +2877,10 @@ def invoicenumberbyein():
             <span style='text-align:left;'>" + found_invoice_data.address + "</span><br />")
             f.close()
             if found_invoice_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip + "</span> \
             </td> \
             <td style='vertical-align: top; text-align:left;' width='50%'> \
@@ -2890,10 +2890,10 @@ def invoicenumberbyein():
             <span style='text-align:left;'>" + found_invoice_data.address_shipping + "</span><br />")
             f.close()
             if found_invoice_data.address2_shipping != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2_shipping + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip_shipping + "</span> \
             </td> \
             </tr> \
@@ -2903,26 +2903,26 @@ def invoicenumberbyein():
             </table> \
             <table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             for item in found_invoice_items:
                 f.write("<tr><td style='width: 25%;'><p><strong>Description</strong></p><p>" + item.item_desc +"</p></td><td style='width: 25%;'><p><strong>Price</strong></p><p>" + format_currency(str(item.item_price), 'USD', locale='en_US') + "</p></td><td style='width: 25%;'><p><strong>Quantity</strong></p><p>" + str(item.item_quant) + "</p></td><td style='width: 25%;'><p><strong>Total</strong></p><p>" + format_currency(str(item.amount), 'USD', locale='en_US') + "</p></td></tr>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'> \
             <tr><td style='width: 50%'>" + "<img src='https:" + found_qrcode_data.image_url + "' alt='QRcode'>" + "</td><td style='width: 50%'><table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<tr><td style='width: 50%'><strong>Subtotal</strong></td><td style='width:[] 50%'>" + format_currency(str(found_invoice_values.subtotal), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Taxes</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.taxes), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Total</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.total), 'USD', locale='en_US') + "</td></tr>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table></td></tr></table>")
             f.close()            
             
@@ -3405,7 +3405,7 @@ def invoicenumberresults():
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
-            f=open("uploads/email" + name + ".html","w")
+            f=open("uploads" + "email" + name + ".html","w")
             f.write("<html><head> \
             </head> \
             <body style='font-family: Arial, Helvetica, Verdana; font-size: 14px;'> \
@@ -3421,10 +3421,10 @@ def invoicenumberresults():
             <span style='text-align:right;'>" + found_profile_data.address1 + "</span><br />")
             f.close()
             if found_profile_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span>" + found_profile_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:right;'>" + found_profile_data.city + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.state + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.zip + "</span> \
             </td> \
             </tr> \
@@ -3448,10 +3448,10 @@ def invoicenumberresults():
             <span style='text-align:left;'>" + found_invoice_data.address + "</span><br />")
             f.close()
             if found_invoice_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip + "</span> \
             </td> \
             <td style='vertical-align: top; text-align:left;' width='50%'> \
@@ -3461,10 +3461,10 @@ def invoicenumberresults():
             <span style='text-align:left;'>" + found_invoice_data.address_shipping + "</span><br />")
             f.close()
             if found_invoice_data.address2_shipping != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2_shipping + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip_shipping + "</span> \
             </td> \
             </tr> \
@@ -3474,26 +3474,26 @@ def invoicenumberresults():
             </table> \
             <table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             for item in found_invoice_items:
                 f.write("<tr><td style='width: 25%;'><p><strong>Description</strong></p><p>" + item.item_desc +"</p></td><td style='width: 25%;'><p><strong>Price</strong></p><p>" + format_currency(str(item.item_price), 'USD', locale='en_US') + "</p></td><td style='width: 25%;'><p><strong>Quantity</strong></p><p>" + str(item.item_quant) + "</p></td><td style='width: 25%;'><p><strong>Total</strong></p><p>" + format_currency(str(item.amount), 'USD', locale='en_US') + "</p></td></tr>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'> \
             <tr><td style='width: 50%'>" + "<img src='https:" + found_qrcode_data.image_url + "' alt='QRcode'>" + "</td><td style='width: 50%'><table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<tr><td style='width: 50%'><strong>Subtotal</strong></td><td style='width:[] 50%'>" + format_currency(str(found_invoice_values.subtotal), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Taxes</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.taxes), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Total</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.total), 'USD', locale='en_US') + "</td></tr>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table></td></tr></table>")
             f.close()            
             
@@ -3976,7 +3976,7 @@ def invoicenumberbydate():
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
-            f=open("uploads/email" + name + ".html","w")
+            f=open("uploads" + "email" + name + ".html","w")
             f.write("<html><head> \
             </head> \
             <body style='font-family: Arial, Helvetica, Verdana; font-size: 14px;'> \
@@ -3992,10 +3992,10 @@ def invoicenumberbydate():
             <span style='text-align:right;'>" + found_profile_data.address1 + "</span><br />")
             f.close()
             if found_profile_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span>" + found_profile_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:right;'>" + found_profile_data.city + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.state + "</span>&nbsp;<span style='text-align:right;'>" + found_profile_data.zip + "</span> \
             </td> \
             </tr> \
@@ -4019,10 +4019,10 @@ def invoicenumberbydate():
             <span style='text-align:left;'>" + found_invoice_data.address + "</span><br />")
             f.close()
             if found_invoice_data.address2 != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2 + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip + "</span> \
             </td> \
             <td style='vertical-align: top; text-align:left;' width='50%'> \
@@ -4032,10 +4032,10 @@ def invoicenumberbydate():
             <span style='text-align:left;'>" + found_invoice_data.address_shipping + "</span><br />")
             f.close()
             if found_invoice_data.address2_shipping != '':
-                f=open("uploads/email" + name + ".html","a")
+                f=open("uploads" + "email" + name + ".html","a")
                 f.write("<span style='text-align:left;'>" + found_invoice_data.address2_shipping + "</span><br />")
                 f.close()
-            f=open("uploads/email" + name + ".html", "a")
+            f=open("uploads" + "email" + name + ".html", "a")
             f.write("<span style='text-align:left;'>" + found_invoice_data.city_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.state_shipping + "</span>&nbsp;<span style='text-align:left;'>" + found_invoice_data.zip_shipping + "</span> \
             </td> \
             </tr> \
@@ -4045,26 +4045,26 @@ def invoicenumberbydate():
             </table> \
             <table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             for item in found_invoice_items:
                 f.write("<tr><td style='width: 25%;'><p><strong>Description</strong></p><p>" + item.item_desc +"</p></td><td style='width: 25%;'><p><strong>Price</strong></p><p>" + format_currency(str(item.item_price), 'USD', locale='en_US') + "</p></td><td style='width: 25%;'><p><strong>Quantity</strong></p><p>" + str(item.item_quant) + "</p></td><td style='width: 25%;'><p><strong>Total</strong></p><p>" + format_currency(str(item.amount), 'USD', locale='en_US') + "</p></td></tr>")
             f.close()
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'> \
             <tr><td style='width: 50%'>" + "<img src='https:" + found_qrcode_data.image_url + "' alt='QRcode'>" + "</td><td style='width: 50%'><table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px; margin-top:20px;'>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("<tr><td style='width: 50%'><strong>Subtotal</strong></td><td style='width:[] 50%'>" + format_currency(str(found_invoice_values.subtotal), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Taxes</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.taxes), 'USD', locale='en_US') + "</td></tr>")
             f.write("<tr><td style='width: 50%'><strong>Total</strong></td><td style='width: 50%'>" + format_currency(str(found_invoice_values.total), 'USD', locale='en_US') + "</td></tr>")
             f.close()
             
-            f=open("uploads/email" + name + ".html","a")
+            f=open("uploads" + "email" + name + ".html","a")
             f.write("</table></td></tr></table>")
             f.close()            
             
