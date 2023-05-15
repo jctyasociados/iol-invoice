@@ -411,16 +411,8 @@ def send_html():
     server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
     server.login(email_username, password)
     server.sendmail(sender_email, receiver_email, message.as_string())
-    server.quit()"""connection = smtplib.SMTP(host='smtp.office365.com', port=587)
-    connection.starttls()
-    connection.login(email_username,password)
-    connection.send_message(message)
-    connection.quit()"""
-
-    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-    server.login(email_username, password)
-    server.sendmail(sender_email, receiver_email, message.as_string())
     server.quit()
+    
     return render_template('email_sent.html', user=current_user)    
 
 
