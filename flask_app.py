@@ -31,10 +31,8 @@ app = Flask(__name__,
             static_folder='static')
 
 
-app.config.from_object(os.getenv('APP_SETTINGS'))
+app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_POOL_RECYCLE'] = 280
-app.config['SQLALCHEMY_POOL_TIMEOUT'] = 20
 modus = Modus(app)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -257,7 +255,7 @@ def upload():
             extension=str(extension[1])
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
-            name=name.replace(".","a")
+            name=name.replace(".","$$$")
             destination=name+"orig"+"."+extension
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], destination))
             
@@ -309,7 +307,6 @@ def upload():
            
             name_url=result.replace("https:","")
             name_url_final=name_url.replace("?dl=0","?raw=1")
-            name_url_pdf=result.replace("?dl=0","?raw=1")
             
             os.chdir(r"..")
             
@@ -345,7 +342,6 @@ def send_html():
     user_hashed=current_user.user_id_hash
     name=user_hashed
     name=name.replace("/","$$$")
-    name=name.replace(".","a")
     
     access_token = app.config['DROPBOX_ACCESS_TOKEN']
 
@@ -377,7 +373,6 @@ def send_html():
     
     name=user_hashed
     name=name.replace("/","$$$")
-    name=name.replace(".","a")
     
     access_token = app.config['DROPBOX_ACCESS_TOKEN']
 
@@ -416,8 +411,16 @@ def send_html():
     server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
     server.login(email_username, password)
     server.sendmail(sender_email, receiver_email, message.as_string())
-    server.quit()
+    server.quit()"""connection = smtplib.SMTP(host='smtp.office365.com', port=587)
+    connection.starttls()
+    connection.login(email_username,password)
+    connection.send_message(message)
+    connection.quit()"""
 
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    server.login(email_username, password)
+    server.sendmail(sender_email, receiver_email, message.as_string())
+    server.quit()
     return render_template('email_sent.html', user=current_user)    
 
 
@@ -644,8 +647,6 @@ def register():
         server.sendmail(sender_email, user.email, message.as_string())
         server.quit()
 
-
-
         flash("A confirmation email has been sent via email.", "success")
         return render_template('login.html', sitekey=sitekey )
         #flash("Account Created")
@@ -842,7 +843,6 @@ def invoice():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
-            name=name.replace(".","a")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -892,9 +892,8 @@ def invoice():
            
             name_url=result.replace("https:","")
             name_url_final=name_url.replace("?dl=0","?raw=1")
-            
             print(result)
-            print(name_url_final)  
+            print(name_url)  
 
 
         
@@ -924,7 +923,6 @@ def invoice():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -1053,8 +1051,7 @@ def invoice():
             db.session.add(new_template)
             db.session.commit()           
             found_html_template_data = db.session.query(TemplateHTMLData).filter_by(user_id=(user_hashed)).first()
-            found_image_data.image_url
-           
+                        
             
             f=open("uploads/" + name + ".html","w")
             f.write("<html><head> \
@@ -1079,7 +1076,6 @@ def invoice():
             <table border='0' cellspacing='5' cellpadding='5' width='100%' style='font-family: Arial, Helvetica, Verdana; font-size: 14px;' id='header_content'> \
             <tr> \
             <td style='vertical-align: top;' width='50%'> \
-            <span>here goes image</span> \
             <img src='https:" + found_image_data.image_url + "' alt='Logo'> \
             </td> \
             <td style='vertical-align: top; text-align:right;' width='50%'> \
@@ -1340,7 +1336,6 @@ def invoice():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
@@ -1454,7 +1449,6 @@ def invoiceedit():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
-            name=name.replace(".","a")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -1535,7 +1529,6 @@ def invoiceedit():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -1949,7 +1942,6 @@ def invoiceedit():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
@@ -2026,7 +2018,6 @@ def invoicenumber():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
-            name=name.replace(".","a")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -2107,7 +2098,6 @@ def invoicenumber():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -2521,7 +2511,6 @@ def invoicenumber():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
@@ -2749,7 +2738,6 @@ def invoicenumberbyein():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
-            name=name.replace(".","a")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -2830,7 +2818,6 @@ def invoicenumberbyein():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -3244,7 +3231,6 @@ def invoicenumberbyein():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
@@ -3320,7 +3306,6 @@ def invoicenumberresults():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
-            name=name.replace(".","a")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -3401,7 +3386,6 @@ def invoicenumberresults():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -3815,7 +3799,6 @@ def invoicenumberresults():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
@@ -3891,7 +3874,6 @@ def invoicenumberbydate():
             
             name=current_user.user_id_hash
             name=name.replace("/","$$$")
-            name=name.replace(".","a")
             destination=name+"orig"+".png"
             qrcodepath = os.path.join(app.config['UPLOAD_FOLDER'], destination)
             print('qrcodepath: ', qrcodepath)
@@ -3972,7 +3954,6 @@ def invoicenumberbydate():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             #write html and pdf code
             print(app.config['UPLOAD_FOLDER'])
             
@@ -4386,7 +4367,6 @@ def invoicenumberbydate():
             
             name=user_hashed
             name=name.replace("/","$$$") 
-            name=name.replace(".","a")
             
             #INPUT_FILENAME = app.config['UPLOAD_FOLDER'] + "/" + name + ".pdf"
             #OUTPUT_TEMPLATE = '/iolcloud/' + name + ".pdf"
