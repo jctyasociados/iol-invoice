@@ -33,6 +33,7 @@ app = Flask(__name__,
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_POOL_RECYCLE"] = 3600
 modus = Modus(app)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
